@@ -43,6 +43,7 @@ beforeAll(async () => {
 
   process.env.DB_CONNECTION = 'postgres'
   process.env.DB_DROP_SCHEMA = 'true'
+  process.env.DB_SYNCHRONIZE = 'true'
 
   // Start a PostgreSQL test container
   const postgresContainer: StartedPostgreSqlContainer =
