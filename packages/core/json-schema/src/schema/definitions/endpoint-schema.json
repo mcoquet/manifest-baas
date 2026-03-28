@@ -27,7 +27,7 @@
       "description": "An optional array of policies applied to the endpoint.",
       "type": "array",
       "items": {
-        "$ref": "https://schema.manifest.build/definitions/policies/policy-schema.json"
+        "$ref": "./policies/policy-schema.json"
       }
     }
   },
