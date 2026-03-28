@@ -9,11 +9,6 @@
   </a>
 </p>
 
-> [!WARNING]
-> 🚧 **Pivot in progress.** This repo contains our previous BaaS product. We're now building  a tool that turns databases into MCP servers for AI agents. More information here → [manifest.build](https://manifest.build)
-
----
-
 <p align='center'>
 <strong>1-file backend to ship fast</strong>
 <br><br>  
