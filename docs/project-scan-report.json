@@ -1,0 +1,62 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-03-28T10:00:00Z",
+    "last_updated": "2026-03-28T10:15:00Z",
+    "completed": null
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "project_root": "/home/user/manifest-baas",
+  "project_knowledge": "/home/user/manifest-baas/docs",
+  "project_types": [
+    {"part_id": "manifest", "project_type_id": "backend", "display_name": "Manifest Core Backend"},
+    {"part_id": "admin", "project_type_id": "web", "display_name": "Admin Panel"},
+    {"part_id": "js-sdk", "project_type_id": "library", "display_name": "JavaScript SDK"},
+    {"part_id": "create-manifest", "project_type_id": "cli", "display_name": "Create Manifest CLI"},
+    {"part_id": "common", "project_type_id": "library", "display_name": "Common Library"},
+    {"part_id": "json-schema", "project_type_id": "library", "display_name": "JSON Schema"},
+    {"part_id": "types", "project_type_id": "library", "display_name": "Types"}
+  ],
+  "repository_type": "monorepo",
+  "completed_steps": [
+    {"step": "step_1", "status": "completed", "timestamp": "2026-03-28T10:00:30Z", "summary": "Classified as monorepo with 7 parts"},
+    {"step": "step_2", "status": "completed", "timestamp": "2026-03-28T10:01:00Z", "summary": "Found 14 READMEs, CONTRIBUTING.md, 3 CHANGELOGs, .github config"},
+    {"step": "step_3", "status": "completed", "timestamp": "2026-03-28T10:03:00Z", "summary": "Tech stack: NestJS/TypeORM backend, Angular 17 admin, TypeScript throughout"},
+    {"step": "step_4", "status": "completed", "timestamp": "2026-03-28T10:08:00Z", "summary": "Deep scan: 30+ API endpoints, 16 property types, 48 admin components, 23 JSON schemas, full SDK API surface"},
+    {"step": "step_5", "status": "completed", "timestamp": "2026-03-28T10:09:00Z", "summary": "Source tree documented with annotations"},
+    {"step": "step_6", "status": "completed", "timestamp": "2026-03-28T10:10:00Z", "summary": "Dev guide: prerequisites, install, build, test, lint, seed, contribution workflow"},
+    {"step": "step_7", "status": "completed", "timestamp": "2026-03-28T10:11:00Z", "summary": "Integration architecture: 6 integration points (build-time + runtime)"},
+    {"step": "step_8", "status": "completed", "timestamp": "2026-03-28T10:12:00Z", "summary": "Architecture docs for all 7 parts (5 files)"},
+    {"step": "step_9", "status": "completed", "timestamp": "2026-03-28T10:13:00Z", "summary": "Supporting docs: API contracts, data models, component inventory, project parts"},
+    {"step": "step_10", "status": "completed", "timestamp": "2026-03-28T10:14:00Z", "summary": "Master index generated with all links"},
+    {"step": "step_11", "status": "in_progress", "timestamp": "2026-03-28T10:15:00Z", "summary": "Validation in progress"}
+  ],
+  "current_step": "step_11",
+  "findings": {
+    "project_classification": "Monorepo (Turborepo + npm workspaces), 7 parts, TypeScript/NestJS primary",
+    "technology_stack": "NestJS 10 + TypeORM on Node.js, Angular 17 admin, TypeScript SDK",
+    "api_count": "30+ endpoints",
+    "data_models": "Dynamic (YAML-defined), 16 property types, 3 relationship types",
+    "components": "48 Angular components (16 inputs, 15 yields, 5 CRUD, 5 layout, 3 auth, 3 root)",
+    "integration_points": "6 (code-gen, build-bundle, REST API x2, TS import, HTTP health)"
+  },
+  "outputs_generated": [
+    "project-scan-report.json",
+    "project-overview.md",
+    "source-tree-analysis.md",
+    "architecture-manifest.md",
+    "architecture-admin.md",
+    "architecture-js-sdk.md",
+    "architecture-create-manifest.md",
+    "architecture-libraries.md",
+    "api-contracts-manifest.md",
+    "data-models-manifest.md",
+    "component-inventory-admin.md",
+    "development-guide.md",
+    "integration-architecture.md",
+    "project-parts.json",
+    "index.md"
+  ],
+  "resume_instructions": "All docs generated. At step 11 validation."
+}
