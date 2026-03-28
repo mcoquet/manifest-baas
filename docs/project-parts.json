@@ -1,0 +1,112 @@
+{
+  "repository_type": "monorepo",
+  "build_system": "turborepo",
+  "package_manager": "npm@10.7.0",
+  "parts": [
+    {
+      "part_id": "manifest",
+      "display_name": "Manifest Core Backend",
+      "project_type": "backend",
+      "root_path": "packages/core/manifest/",
+      "entry_point": "src/main.ts",
+      "tech_stack": ["NestJS 10", "TypeORM 0.3", "SQLite/PostgreSQL/MySQL", "JWT", "Express"],
+      "published_package": "manifest"
+    },
+    {
+      "part_id": "admin",
+      "display_name": "Admin Panel",
+      "project_type": "web",
+      "root_path": "packages/core/admin/",
+      "entry_point": "src/main.ts",
+      "tech_stack": ["Angular 17", "Bulma CSS", "ngx-quill", "RxJS"],
+      "published_package": null,
+      "notes": "Bundled into manifest backend dist"
+    },
+    {
+      "part_id": "js-sdk",
+      "display_name": "JavaScript SDK",
+      "project_type": "library",
+      "root_path": "packages/js-sdk/",
+      "entry_point": "src/index.ts",
+      "tech_stack": ["TypeScript", "Fetch API"],
+      "published_package": "@mnfst/sdk"
+    },
+    {
+      "part_id": "create-manifest",
+      "display_name": "Create Manifest CLI",
+      "project_type": "cli",
+      "root_path": "packages/create-manifest/",
+      "entry_point": "bin/run.js",
+      "tech_stack": ["Oclif", "Axios"],
+      "published_package": "create-manifest"
+    },
+    {
+      "part_id": "common",
+      "display_name": "Common Library",
+      "project_type": "library",
+      "root_path": "packages/core/common/",
+      "entry_point": "src/index.ts",
+      "tech_stack": ["TypeScript"],
+      "published_package": null,
+      "notes": "Workspace package @repo/common"
+    },
+    {
+      "part_id": "json-schema",
+      "display_name": "JSON Schema",
+      "project_type": "library",
+      "root_path": "packages/core/json-schema/",
+      "entry_point": "src/index.ts",
+      "tech_stack": ["TypeScript", "JSON Schema"],
+      "published_package": null,
+      "notes": "Workspace package @repo/json-schema, generates types"
+    },
+    {
+      "part_id": "types",
+      "display_name": "TypeScript Types",
+      "project_type": "library",
+      "root_path": "packages/core/types/",
+      "entry_point": "src/index.ts",
+      "tech_stack": ["TypeScript"],
+      "published_package": null,
+      "notes": "Workspace package @repo/types, consumed by all packages"
+    }
+  ],
+  "integration_points": [
+    {
+      "from": "json-schema",
+      "to": "types",
+      "type": "code-generation",
+      "details": "json-schema-to-typescript generates ManifestSchema.ts"
+    },
+    {
+      "from": "admin",
+      "to": "manifest",
+      "type": "build-bundling",
+      "details": "Angular build output copied to manifest/dist/admin/"
+    },
+    {
+      "from": "admin",
+      "to": "manifest",
+      "type": "REST API",
+      "details": "Admin SPA calls /api/* endpoints at runtime"
+    },
+    {
+      "from": "js-sdk",
+      "to": "manifest",
+      "type": "REST API",
+      "details": "SDK calls /api/* endpoints via Fetch"
+    },
+    {
+      "from": "js-sdk",
+      "to": "common",
+      "type": "TypeScript import",
+      "details": "Extends BaseSDK class"
+    },
+    {
+      "from": "create-manifest",
+      "to": "manifest",
+      "type": "HTTP health check",
+      "details": "Polls /api/health during project scaffolding"
+    }
+  ]
+}
