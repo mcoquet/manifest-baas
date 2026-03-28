@@ -1,0 +1,30 @@
+{
+  "workflow_version": "1.2.0",
+  "timestamps": {
+    "started": "2026-03-28T10:00:00Z",
+    "last_updated": "2026-03-28T10:00:00Z"
+  },
+  "mode": "initial_scan",
+  "scan_level": "deep",
+  "project_root": "/home/user/manifest-baas",
+  "project_knowledge": "/home/user/manifest-baas/docs",
+  "project_types": [
+    {"part_id": "manifest", "project_type_id": "backend", "display_name": "Manifest Core Backend"},
+    {"part_id": "admin", "project_type_id": "web", "display_name": "Admin Panel"},
+    {"part_id": "js-sdk", "project_type_id": "library", "display_name": "JavaScript SDK"},
+    {"part_id": "create-manifest", "project_type_id": "cli", "display_name": "Create Manifest CLI"},
+    {"part_id": "common", "project_type_id": "library", "display_name": "Common Library"},
+    {"part_id": "json-schema", "project_type_id": "library", "display_name": "JSON Schema"},
+    {"part_id": "types", "project_type_id": "library", "display_name": "Types"}
+  ],
+  "repository_type": "monorepo",
+  "completed_steps": [
+    {"step": "step_1", "status": "completed", "timestamp": "2026-03-28T10:00:30Z", "summary": "Classified as monorepo with 7 parts: manifest (backend), admin (web), js-sdk (library), create-manifest (cli), common (library), json-schema (library), types (library)"}
+  ],
+  "current_step": "step_2",
+  "findings": {
+    "project_classification": "Monorepo (Turborepo + npm workspaces), 7 parts, TypeScript/NestJS primary"
+  },
+  "outputs_generated": ["project-scan-report.json"],
+  "resume_instructions": "Resuming from step 2"
+}
