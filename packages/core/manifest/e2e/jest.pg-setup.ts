@@ -41,6 +41,8 @@ beforeAll(async () => {
     'handlers'
   )
 
+  process.env.ADMIN_PASSWORD = 'admin'
+
   process.env.DB_CONNECTION = 'postgres'
   process.env.DB_DROP_SCHEMA = 'true'
   process.env.DB_SYNCHRONIZE = 'true'

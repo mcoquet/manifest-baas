@@ -35,6 +35,8 @@ beforeAll(async () => {
     'handlers'
   )
 
+  process.env.ADMIN_PASSWORD = 'admin'
+
   process.env.DB_CONNECTION = 'sqlite'
   process.env.DB_PATH = ':memory:'
   process.env.DB_DROP_SCHEMA = 'true'

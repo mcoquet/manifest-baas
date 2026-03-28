@@ -6,7 +6,6 @@ import { ActivatedRoute, Params, Router } from '@angular/router'
 import { PropType } from '@repo/types'
 
 import { AuthService } from '../../auth.service'
-import { DEFAULT_ADMIN_CREDENTIALS } from '../../../../../constants'
 import { ManifestService } from '../../../shared/services/manifest.service'
 
 @Component({
@@ -44,15 +43,10 @@ export class LoginComponent implements OnInit {
     })
 
     this.activatedRoute.queryParams.subscribe(async (queryParams: Params) => {
-      // Set suggested email and password from query params or default admin credentials.
+      // Set suggested email and password from query params if provided.
       if (queryParams['email'] && queryParams['password']) {
         this.suggestedEmail = queryParams['email']
         this.suggestedPassword = queryParams['password']
-      } else {
-        if (await this.authService.isDefaultAdminExists()) {
-          this.suggestedEmail = DEFAULT_ADMIN_CREDENTIALS.email
-          this.suggestedPassword = DEFAULT_ADMIN_CREDENTIALS.password
-        }
       }
       this.form = new FormGroup({
         email: new FormControl(this.suggestedEmail || '', [

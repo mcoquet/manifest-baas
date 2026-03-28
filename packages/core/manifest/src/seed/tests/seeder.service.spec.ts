@@ -7,7 +7,7 @@ import { DataSource, EntityMetadata } from 'typeorm'
 import { EntityManifestService } from '../../manifest/services/entity-manifest.service'
 import { StorageService } from '../../storage/services/storage.service'
 import {
-  DEFAULT_ADMIN_CREDENTIALS,
+  DEFAULT_ADMIN_EMAIL,
   DEFAULT_IMAGE_SIZES,
   DEFAULT_MAX_MANY_TO_MANY_RELATIONS
 } from '../../constants'
@@ -877,7 +877,7 @@ describe('SeederService', () => {
 
       expect(dummyRepository.save).toHaveBeenCalledWith(
         expect.objectContaining({
-          email: DEFAULT_ADMIN_CREDENTIALS.email
+          email: DEFAULT_ADMIN_EMAIL
         })
       )
     })

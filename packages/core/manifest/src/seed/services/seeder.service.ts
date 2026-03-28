@@ -21,11 +21,12 @@ import bcrypt from 'bcryptjs'
 import {
   ADMIN_ENTITY_MANIFEST,
   AUTHENTICABLE_PROPS,
-  DEFAULT_ADMIN_CREDENTIALS,
+  DEFAULT_ADMIN_EMAIL,
   DEFAULT_MAX_MANY_TO_MANY_RELATIONS,
   DUMMY_FILE_NAME,
   DUMMY_IMAGE_NAME
 } from '../../constants'
+import { randomBytes } from 'crypto'
 
 import { StorageService } from '../../storage/services/storage.service'
 import { EntityManifestService } from '../../manifest/services/entity-manifest.service'
@@ -378,19 +379,30 @@ export class SeederService {
   }
 
   /**
-   * Seed the Admin table with default credentials. Only one admin user is created.
+   * Seed the Admin table with credentials. Only one admin user is created.
+   * Uses ADMIN_EMAIL and ADMIN_PASSWORD env vars if set, otherwise generates
+   * a random password and displays it to the user.
    *
    * @param repository The repository for the Admin entity.
    */
   async seedAdmin(repository: Repository<BaseEntity>): Promise<void> {
-    console.log(
-      `✅ Seeding default admin ${DEFAULT_ADMIN_CREDENTIALS.email} with password "${DEFAULT_ADMIN_CREDENTIALS.password}"...`
-    )
+    const email = process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL
+    const password =
+      process.env.ADMIN_PASSWORD || randomBytes(16).toString('base64url')
+
+    console.log(`✅ Seeding default admin...`)
+    console.log(`   Email:    ${email}`)
+    if (!process.env.ADMIN_PASSWORD) {
+      console.log(`   Password: ${password}`)
+      console.log(
+        `   ⚠️  Save this password now! Set ADMIN_PASSWORD env var to use a fixed password.`
+      )
+    }
 
     const admin: AuthenticableEntity =
       repository.create() as AuthenticableEntity
-    admin.email = DEFAULT_ADMIN_CREDENTIALS.email
-    admin.password = bcrypt.hashSync(DEFAULT_ADMIN_CREDENTIALS.password, 1)
+    admin.email = email
+    admin.password = bcrypt.hashSync(password, 1)
 
     await repository.save(admin)
   }

@@ -39,6 +39,8 @@ beforeAll(async () => {
     'handlers'
   )
 
+  process.env.ADMIN_PASSWORD = 'admin'
+
   process.env.DB_CONNECTION = 'mysql'
   process.env.DB_DROP_SCHEMA = 'true'
   process.env.DB_SYNCHRONIZE = 'true'

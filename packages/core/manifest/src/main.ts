@@ -13,7 +13,6 @@ import { AppModule } from './app.module'
 import {
   API_PATH,
   DEFAULT_PORT,
-  DEFAULT_TOKEN_SECRET_KEY,
   STORAGE_PATH
 } from './constants'
 import { OpenApiService } from './open-api/services/open-api.service'
@@ -39,10 +38,7 @@ async function bootstrap() {
   const isProduction: boolean = configService.get('NODE_ENV') === 'production'
   const isTest: boolean = configService.get('NODE_ENV') === 'test'
 
-  if (
-    isProduction &&
-    configService.get('tokenSecretKey') === DEFAULT_TOKEN_SECRET_KEY
-  ) {
+  if (isProduction && !process.env.TOKEN_SECRET_KEY) {
     throw new Error(
       'Token secret key not defined. Please set a custom token secret key to run in production environment adding TOKEN_SECRET_KEY in your env file.'
     )
