@@ -44,6 +44,9 @@ Thumbs.db
 *.mov
 *.wmv
 
+# Manifest generated files
+.manifest/
+
 # Turbo
 .turbo
 
