@@ -109,14 +109,29 @@ export default (): {
   }
 }
 
+function isProduction(): boolean {
+  return process.env.NODE_ENV === 'production'
+}
+
+function getDropSchema(): boolean {
+  if (isProduction()) {
+    return false
+  }
+  return process.env.DB_DROP_SCHEMA === 'true'
+}
+
+function getSynchronize(): boolean {
+  return process.env.DB_SYNCHRONIZE === 'true'
+}
+
 function getSqliteConnectionOptions(
   generatedFolder: string
 ): SqliteConnectionOptions {
   return {
     type: 'sqlite',
     database: process.env.DB_PATH || `${generatedFolder}/db.sqlite`,
-    dropSchema: process.env.DB_DROP_SCHEMA === 'true' || false,
-    synchronize: true
+    dropSchema: getDropSchema(),
+    synchronize: getSynchronize()
   }
 }
 
@@ -128,15 +143,16 @@ function getPostgresConnectionOptions(): PostgresConnectionOptions {
     username: process.env.DB_USERNAME || 'postgres',
     password: process.env.DB_PASSWORD || 'postgres',
     database: process.env.DB_DATABASE || 'manifest',
-    dropSchema: process.env.DB_DROP_SCHEMA === 'true' || false,
+    dropSchema: getDropSchema(),
     ssl:
       process.env.DB_SSL === 'true'
         ? {
-            rejectUnauthorized: false,
+            rejectUnauthorized:
+              process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
             requestCert: true
           }
         : false,
-    synchronize: true
+    synchronize: getSynchronize()
   }
 }
 
@@ -148,14 +164,15 @@ function getMysqlConnectionOptions(): MysqlConnectionOptions {
     username: process.env.DB_USERNAME || 'root',
     password: process.env.DB_PASSWORD || 'password',
     database: process.env.DB_DATABASE || 'manifest',
-    dropSchema: process.env.DB_DROP_SCHEMA === 'true' || false,
+    dropSchema: getDropSchema(),
     ssl:
       process.env.DB_SSL === 'true'
         ? {
-            rejectUnauthorized: false,
+            rejectUnauthorized:
+              process.env.DB_SSL_REJECT_UNAUTHORIZED !== 'false',
             requestCert: true
           }
         : false,
-    synchronize: true
+    synchronize: getSynchronize()
   }
 }

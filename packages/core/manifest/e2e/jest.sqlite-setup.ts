@@ -38,6 +38,7 @@ beforeAll(async () => {
   process.env.DB_CONNECTION = 'sqlite'
   process.env.DB_PATH = ':memory:'
   process.env.DB_DROP_SCHEMA = 'true'
+  process.env.DB_SYNCHRONIZE = 'true'
 
   // Start the NestJS application mocking some services.
   const moduleFixture: TestingModule = await Test.createTestingModule({

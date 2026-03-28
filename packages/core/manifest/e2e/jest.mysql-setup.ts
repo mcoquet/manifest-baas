@@ -41,6 +41,7 @@ beforeAll(async () => {
 
   process.env.DB_CONNECTION = 'mysql'
   process.env.DB_DROP_SCHEMA = 'true'
+  process.env.DB_SYNCHRONIZE = 'true'
 
   // Start a PostgreSQL test container
   const mysqlContainer: StartedMySqlContainer = await new MySqlContainer()
