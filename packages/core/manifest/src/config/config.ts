@@ -121,7 +121,10 @@ function getDropSchema(): boolean {
 }
 
 function getSynchronize(): boolean {
-  return process.env.DB_SYNCHRONIZE === 'true'
+  if (process.env.DB_SYNCHRONIZE !== undefined) {
+    return process.env.DB_SYNCHRONIZE === 'true'
+  }
+  return !isProduction()
 }
 
 function getSqliteConnectionOptions(
