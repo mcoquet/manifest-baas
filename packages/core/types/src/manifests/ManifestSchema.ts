@@ -511,18 +511,7 @@ export interface EndpointSchema {
   /**
    * An optional array of policies applied to the endpoint.
    */
-  policies?: PolicySchema1[]
-}
-/**
- * The policies of the entity. Doc: https://manifest.build/docs/policies
- */
-export interface PolicySchema1 {
-  access: 'public' | 'restricted' | 'forbidden' | 'admin' | '🌐' | '🚫' | '🔒' | '️👨🏻‍💻'
-  allow?: string | string[]
-  /**
-   * When set to 'self', restricts access to records owned by the authenticated user (requires belongsTo relationship)
-   */
-  condition?: 'self'
+  policies?: PolicySchema[]
 }
 /**
  * Application settings configuration
