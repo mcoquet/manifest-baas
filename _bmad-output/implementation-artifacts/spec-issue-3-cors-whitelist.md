@@ -2,7 +2,8 @@
 title: 'Configure CORS with origin whitelist for production'
 type: 'feature'
 created: '2026-03-29'
-status: 'draft'
+status: 'done'
+baseline_commit: '24e7bab'
 context: []
 ---
 
@@ -52,8 +53,8 @@ context: []
 ## Tasks & Acceptance
 
 **Execution:**
-- [ ] `packages/core/manifest/src/config/config.ts` -- Add `allowedOrigins` field that parses `ALLOWED_ORIGINS` env var into `string[]` (comma-split, trimmed) or `undefined` if not set
-- [ ] `packages/core/manifest/src/main.ts` -- Replace `cors: true` with conditional: if production and `allowedOrigins` is set, use `{ origin: callback, credentials: true }`; if production with no origins, use `{ origin: false, credentials: true }` and log warning; otherwise keep `cors: true`
+- [x] `packages/core/manifest/src/config/config.ts` -- Add `allowedOrigins` field that parses `ALLOWED_ORIGINS` env var into `string[]` (comma-split, trimmed) or `undefined` if not set
+- [x] `packages/core/manifest/src/main.ts` -- Replace `cors: true` with conditional: if production and `allowedOrigins` is set, use `{ origin: callback, credentials: true }`; if production with no origins, use `{ origin: false, credentials: true }` and log warning; otherwise keep `cors: true`
 
 **Acceptance Criteria:**
 - Given `NODE_ENV=development`, when the server starts, then CORS allows all origins (same as current behavior)
@@ -81,3 +82,14 @@ origin: (origin, callback) => {
 
 **Commands:**
 - `cd packages/core/manifest && npx tsc --noEmit` -- expected: no type errors
+
+## Suggested Review Order
+
+- Environment-aware CORS factory — entry point for the entire change
+  [`main.ts:22`](../../packages/core/manifest/src/main.ts#L22)
+
+- Production whitelist with origin callback and credentials
+  [`main.ts:42`](../../packages/core/manifest/src/main.ts#L42)
+
+- Bootstrap wiring — CORS options derived from env vars at startup
+  [`main.ts:56`](../../packages/core/manifest/src/main.ts#L56)
