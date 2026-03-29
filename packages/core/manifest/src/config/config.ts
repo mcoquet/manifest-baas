@@ -3,10 +3,21 @@ import { PostgresConnectionOptions } from 'typeorm/driver/postgres/PostgresConne
 import { SqliteConnectionOptions } from 'typeorm/driver/sqlite/SqliteConnectionOptions'
 import {
   DEFAULT_PORT,
-  DEFAULT_TOKEN_SECRET_KEY,
   GENERATED_FOLDER_PATH
 } from '../constants'
 import path from 'path'
+import { randomBytes } from 'crypto'
+
+function getTokenSecretKey(): string {
+  if (process.env.TOKEN_SECRET_KEY) {
+    return process.env.TOKEN_SECRET_KEY
+  }
+  const generated = randomBytes(32).toString('hex')
+  console.warn(
+    '⚠️  No TOKEN_SECRET_KEY set. Using a random secret — tokens will not persist across restarts. Set TOKEN_SECRET_KEY in your env file for stable tokens.'
+  )
+  return generated
+}
 
 export default (): {
   port: number | string
@@ -71,7 +82,7 @@ export default (): {
     // General configuration.
     port: process.env.PORT || DEFAULT_PORT,
     nodeEnv: process.env.NODE_ENV || 'development',
-    tokenSecretKey: process.env.TOKEN_SECRET_KEY || DEFAULT_TOKEN_SECRET_KEY,
+    tokenSecretKey: getTokenSecretKey(),
     baseUrl:
       process.env.BASE_URL ||
       `http://localhost:${process.env.PORT || DEFAULT_PORT}`,

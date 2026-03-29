@@ -27,6 +27,7 @@ export const DEFAULT_MAX_MANY_TO_MANY_RELATIONS: number = 5
 export const DUMMY_FILE_NAME: string = 'dummy-invoice.pdf'
 export const DUMMY_IMAGE_NAME: string = 'dummy-image.jpg'
 export const DEFAULT_TOKEN_SECRET_KEY: string = 'REPLACE_ME'
+export const DEFAULT_ADMIN_EMAIL: string = 'admin@manifest.build'
 
 // Uploads.
 export const DEFAULT_IMAGE_SIZES: ImageSizesObject = {
@@ -56,6 +57,10 @@ export const AUTHENTICABLE_PROPS: PropertyManifest[] = [
 ]
 
 // Admin entity.
+/**
+ * @deprecated Use DEFAULT_ADMIN_EMAIL and ADMIN_EMAIL/ADMIN_PASSWORD env vars instead.
+ * Kept for backward compatibility in e2e tests.
+ */
 export const DEFAULT_ADMIN_CREDENTIALS = {
   email: 'admin@manifest.build',
   password: 'admin'

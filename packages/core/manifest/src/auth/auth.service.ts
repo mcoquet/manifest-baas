@@ -7,7 +7,7 @@ import * as jwt from 'jsonwebtoken'
 import { Repository } from 'typeorm'
 import { EntityService } from '../entity/services/entity.service'
 import { SignupAuthenticableEntityDto } from './dtos/signup-authenticable-entity.dto'
-import { ADMIN_ENTITY_MANIFEST, DEFAULT_ADMIN_CREDENTIALS } from '../constants'
+import { ADMIN_ENTITY_MANIFEST, DEFAULT_ADMIN_EMAIL } from '../constants'
 import { EntityManifestService } from '../manifest/services/entity-manifest.service'
 import { CrudService } from '../crud/services/crud.service'
 
@@ -189,16 +189,21 @@ export class AuthService {
   }
 
   /**
-   * Returns whether the default admin exists.
+   * Returns whether the default admin exists (by email).
    *
    * @returns A promise that resolves to an object with the key 'exists' that is true if the default admin exists, and false otherwise.
    * */
   async isDefaultAdminExists(): Promise<{ exists: boolean }> {
-    const admin: AuthenticableEntity = await this.findUserFromCredentials(
-      ADMIN_ENTITY_MANIFEST.slug,
-      DEFAULT_ADMIN_CREDENTIALS.email,
-      DEFAULT_ADMIN_CREDENTIALS.password
-    )
+    const adminEmail = process.env.ADMIN_EMAIL || DEFAULT_ADMIN_EMAIL
+
+    const entityRepository: Repository<AuthenticableEntity> =
+      this.entityService.getEntityRepository({
+        entitySlug: ADMIN_ENTITY_MANIFEST.slug
+      }) as Repository<AuthenticableEntity>
+
+    const admin = await entityRepository.findOne({
+      where: { email: adminEmail }
+    })
 
     return { exists: !!admin }
   }

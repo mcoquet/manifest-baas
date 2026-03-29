@@ -206,7 +206,9 @@ Policies are defined per-entity per-operation in `manifest.yml`:
 |----------|---------|-------------|
 | `NODE_ENV` | development | Environment mode |
 | `PORT` | 1111 | Server port |
-| `TOKEN_SECRET_KEY` | (required in prod) | JWT signing secret |
+| `TOKEN_SECRET_KEY` | (auto-generated) | JWT signing secret. Required in production; random secret generated in dev (tokens won't persist across restarts) |
+| `ADMIN_EMAIL` | admin@manifest.build | Default admin email for seeding |
+| `ADMIN_PASSWORD` | (auto-generated) | Default admin password for seeding. If not set, a random password is generated and displayed in console |
 | `DB_CONNECTION` | sqlite | Database engine: sqlite, postgres, mysql |
 | `DB_HOST` | localhost | Database host |
 | `DB_PORT` | auto | Database port |
@@ -215,6 +217,9 @@ Policies are defined per-entity per-operation in `manifest.yml`:
 | `DB_DATABASE` | manifest | Database name |
 | `DB_PATH` | ./.manifest/db.sqlite | SQLite file path |
 | `DB_SSL` | false | Enable SSL |
+| `DB_SSL_REJECT_UNAUTHORIZED` | true | Set to `false` to disable SSL certificate verification (dev only) |
+| `DB_SYNCHRONIZE` | true (non-prod) | Enable TypeORM schema sync. Defaults to false in production |
+| `DB_DROP_SCHEMA` | false | Drop schema on startup. Blocked in production regardless of setting |
 | `MANIFEST_FILE_PATH` | ./manifest.yml | Path to manifest file |
 | `S3_BUCKET` | — | S3 bucket name |
 | `S3_ENDPOINT` | — | S3 endpoint URL |

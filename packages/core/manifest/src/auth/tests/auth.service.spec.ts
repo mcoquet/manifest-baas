@@ -247,16 +247,18 @@ describe('AuthService', () => {
 
   describe('isDefaultAdminExists', () => {
     it('should return true if the default admin exists', async () => {
-      jest
-        .spyOn(authService, 'findUserFromCredentials')
-        .mockResolvedValue(mockUser)
+      entityService.getEntityRepository = jest.fn().mockReturnValue({
+        findOne: jest.fn().mockResolvedValue(mockUser)
+      })
 
       const result = await authService.isDefaultAdminExists()
       expect(result.exists).toBe(true)
     })
 
     it('should return false if the default admin does not exist', async () => {
-      jest.spyOn(authService, 'findUserFromCredentials').mockResolvedValue(null)
+      entityService.getEntityRepository = jest.fn().mockReturnValue({
+        findOne: jest.fn().mockResolvedValue(null)
+      })
 
       const result = await authService.isDefaultAdminExists()
       expect(result.exists).toBe(false)
