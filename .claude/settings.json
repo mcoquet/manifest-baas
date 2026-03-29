@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "Bash",
+        "hooks": [
+          {
+            "type": "prompt",
+            "if": "Bash(git commit:*)",
+            "prompt": "The user is about to run a git commit. Check whether /simplify and /bmad-review-edge-case-hunter were run on the current changes during this session BEFORE this commit. Look at the conversation history for evidence that these skills were invoked. If both skills were run, respond with {\"decision\": \"allow\"}. If either skill was NOT run, respond with {\"decision\": \"block\", \"reason\": \"Pre-commit review skills not run. Please run /simplify and /bmad-review-edge-case-hunter before committing. See CLAUDE.md for the full workflow.\"}",
+            "statusMessage": "Checking pre-commit review gates..."
+          }
+        ]
+      }
+    ]
+  }
+}
