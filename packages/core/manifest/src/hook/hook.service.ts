@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import {
   CrudEventName,
   HookManifest,
@@ -8,6 +8,7 @@ import {
 
 @Injectable()
 export class HookService {
+  private readonly logger = new Logger(HookService.name)
   /**
    * Transforms a hook schema into a hook manifest.
    *
@@ -64,7 +65,7 @@ export class HookService {
           hookManifest.method !== 'GET' ? JSON.stringify(payload) : undefined // GET requests don't have a body.
       })
     } catch {
-      console.error(
+      this.logger.error(
         `Failed to trigger webhook "${hookManifest.url}" for event "${hookManifest.event}" (entity: "${entity}").`
       )
     }

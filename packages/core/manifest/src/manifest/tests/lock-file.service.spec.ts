@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { ConfigService } from '@nestjs/config'
 import { LockFileService } from '../services/lock-file.service'
@@ -86,7 +87,7 @@ describe('LockFileService', () => {
     })
 
     it('should detect npm lock file third', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
+      const loggerSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation()
       ;(fs.existsSync as jest.Mock).mockImplementation((path: string) => {
         return path.includes('package-lock.json')
       })
@@ -98,23 +99,23 @@ describe('LockFileService', () => {
         `${mockProjectRoot}/package-lock.json`
       )
       expect(service.getPackageManager()).toBe('npm')
-      expect(consoleSpy).not.toHaveBeenCalled()
+      expect(loggerSpy).not.toHaveBeenCalled()
 
-      consoleSpy.mockRestore()
+      loggerSpy.mockRestore()
     })
 
     it('should warn when no lock file is found', () => {
-      const consoleSpy = jest.spyOn(console, 'warn').mockImplementation()
+      const loggerSpy = jest.spyOn(Logger.prototype, 'warn').mockImplementation()
       ;(fs.existsSync as jest.Mock).mockReturnValue(false)
 
       service = new LockFileService(configService)
 
       expect(service.getPackageManager()).toBe('unknown')
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'No lock file found. Version checking will be limited.'
       )
 
-      consoleSpy.mockRestore()
+      loggerSpy.mockRestore()
     })
   })
 
@@ -185,18 +186,18 @@ describe('LockFileService', () => {
     })
 
     it('should handle malformed npm lock file', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation()
       ;(fs.readFileSync as jest.Mock).mockReturnValue('invalid json')
 
       service = new LockFileService(configService)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error parsing npm lock file:',
         expect.any(Error)
       )
       expect(service.getInstalledVersion('any-package')).toBeNull()
 
-      consoleSpy.mockRestore()
+      loggerSpy.mockRestore()
     })
   })
 
@@ -228,19 +229,19 @@ lodash@^4.17.21:
     })
 
     it('should handle malformed yarn lock file', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation()
       ;(fs.readFileSync as jest.Mock).mockImplementation(() => {
         throw new Error('File not found')
       })
 
       service = new LockFileService(configService)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error parsing yarn lock file:',
         expect.any(Error)
       )
 
-      consoleSpy.mockRestore()
+      loggerSpy.mockRestore()
     })
   })
 
@@ -369,19 +370,19 @@ lodash@^4.17.21:
     })
 
     it('should handle malformed pnpm lock file', () => {
-      const consoleSpy = jest.spyOn(console, 'error').mockImplementation()
+      const loggerSpy = jest.spyOn(Logger.prototype, 'error').mockImplementation()
       ;(fs.readFileSync as jest.Mock).mockImplementation(() => {
         throw new Error('File not found')
       })
 
       service = new LockFileService(configService)
 
-      expect(consoleSpy).toHaveBeenCalledWith(
+      expect(loggerSpy).toHaveBeenCalledWith(
         'Error parsing pnpm lock file:',
         expect.any(Error)
       )
 
-      consoleSpy.mockRestore()
+      loggerSpy.mockRestore()
     })
 
     it('should handle empty pnpm lock file', () => {

@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { readFileSync, existsSync } from 'fs'
 import { join } from 'path'
 import * as yaml from 'js-yaml'
@@ -7,6 +7,7 @@ import { ConfigService } from '@nestjs/config'
 
 @Injectable()
 export class LockFileService {
+  private readonly logger = new Logger(LockFileService.name)
   private installedPackages: Record<string, string> = {}
   private packageManager: 'npm' | 'yarn' | 'pnpm' | 'unknown' = 'unknown'
 
@@ -32,7 +33,7 @@ export class LockFileService {
       this.packageManager = 'npm'
       this.parseNpmLock(join(rootPath, 'package-lock.json'))
     } else {
-      console.warn('No lock file found. Version checking will be limited.')
+      this.logger.warn('No lock file found. Version checking will be limited.')
     }
   }
 
@@ -74,7 +75,7 @@ export class LockFileService {
         this.extractFromNpmDependencies(lockFile.dependencies)
       }
     } catch (error) {
-      console.error('Error parsing npm lock file:', error)
+      this.logger.error('Error parsing npm lock file:', error)
     }
   }
 
@@ -121,7 +122,7 @@ export class LockFileService {
         }
       }
     } catch (error) {
-      console.error('Error parsing yarn lock file:', error)
+      this.logger.error('Error parsing yarn lock file:', error)
     }
   }
 
@@ -137,7 +138,7 @@ export class LockFileService {
         })
       }
     } catch (error) {
-      console.error('Error parsing yarn lock file with library:', error)
+      this.logger.error('Error parsing yarn lock file with library:', error)
       // Fallback to manual parsing
       this.parseYarnLock(filePath)
     }
@@ -221,7 +222,7 @@ export class LockFileService {
         )
       }
     } catch (error) {
-      console.error('Error parsing pnpm lock file:', error)
+      this.logger.error('Error parsing pnpm lock file:', error)
     }
   }
 

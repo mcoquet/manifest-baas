@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 
 import { SeederService } from '../services/seeder.service'
@@ -58,10 +59,13 @@ describe('SeederService', () => {
   beforeAll(() => {
     originalConsoleLog = console.log
     console.log = jest.fn()
+    jest.spyOn(Logger.prototype, 'log').mockImplementation(() => {})
+    jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
   })
 
   afterAll(() => {
     console.log = originalConsoleLog
+    jest.restoreAllMocks()
   })
 
   beforeEach(async () => {
@@ -227,7 +231,7 @@ describe('SeederService', () => {
       expect(repository.save).toHaveBeenCalledTimes(
         dummyEntityManifest.seedCount
       )
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.log).toHaveBeenCalledWith(
         expect.stringContaining(
           `Seeding ${dummyEntityManifest.seedCount} ${dummyEntityManifest.namePlural}...`
         )
@@ -643,7 +647,7 @@ describe('SeederService', () => {
 
       await service.seed('child')
 
-      expect(console.log).not.toHaveBeenCalledWith(
+      expect(Logger.prototype.log).not.toHaveBeenCalledWith(
         expect.stringContaining(
           `Seeding ${dummyEntityManifest.seedCount} ${dummyEntityManifest.namePlural}...`
         )

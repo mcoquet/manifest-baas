@@ -2,24 +2,29 @@ import { INestApplicationContext } from '@nestjs/common'
 import { NestFactory } from '@nestjs/core'
 import { AppModule } from '../../app.module'
 import { SeederService } from '../services/seeder.service'
+import { AppLoggerService, getLogLevels } from '../../logger/app-logger.service'
 
 async function bootstrap() {
+  const logger = new AppLoggerService('Seed', {
+    logLevels: getLogLevels()
+  })
+
   NestFactory.createApplicationContext(AppModule, {
-    logger: ['error', 'warn']
+    logger
   })
     .then((appContext: INestApplicationContext) => {
-      console.log('🌱 Seeding database...')
+      logger.log('Seeding database...')
 
       appContext
         .get(SeederService)
         .seed()
         .then(() => {
-          console.log(
-            '🌱 Seed complete ! Please refresh your browser to see your new data.'
+          logger.log(
+            'Seed complete! Please refresh your browser to see your new data.'
           )
         })
         .catch((error) => {
-          console.error('Seeding failed!')
+          logger.error('Seeding failed!')
           throw error
         })
         .finally(() => appContext.close())

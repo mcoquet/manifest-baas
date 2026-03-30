@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { SchemaService } from '../services/schema.service'
 import schemas from '@repo/json-schema'
@@ -44,14 +45,14 @@ describe('SchemaService', () => {
 
   describe('Validate against schema', () => {
     it('should console log errors when schema validation fails', () => {
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateAgainstSchema('wrong manifest' as any, schemas[0])
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('Validation failed')
       )
     })
@@ -146,26 +147,26 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateCustomLogic(manifestWithDuplicateBelongsToRelationships)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
 
       service.validateCustomLogic(manifestWithDuplicateMixedRelationships)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
 
       service.validateCustomLogic(manifestWithDuplicateMixedSyntaxRelationships)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })
@@ -197,14 +198,14 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateCustomLogic(manifestWithNonExistingRelationships)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })
@@ -235,14 +236,14 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateCustomLogic(manifestWithNonExistingGroups)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })
@@ -278,13 +279,13 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
       service.validateCustomLogic(manifestWithGroupProperties)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })
@@ -313,14 +314,14 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateCustomLogic(manifestWithNonExistingPolicies)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })
@@ -342,14 +343,14 @@ describe('SchemaService', () => {
         }
       }
 
-      jest.spyOn(console, 'log').mockImplementation(() => {})
+      jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
       jest.spyOn(process, 'exit').mockImplementation(() => {
         return null as never
       })
 
       service.validateCustomLogic(manifestWithDuplicateManyToMany)
 
-      expect(console.log).toHaveBeenCalledWith(
+      expect(Logger.prototype.error).toHaveBeenCalledWith(
         expect.stringContaining('VALIDATION FAILED')
       )
     })

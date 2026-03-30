@@ -1,4 +1,4 @@
-import { ValidationPipe } from '@nestjs/common'
+import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger'
@@ -18,6 +18,9 @@ import {
 import { OpenApiService } from './open-api/services/open-api.service'
 import { EntityTypeService } from './entity/services/entity-type.service'
 import { EntityTsTypeInfo } from './entity/types/entity-ts-type-info'
+import { AppLoggerService, getLogLevels } from './logger/app-logger.service'
+
+const corsLogger = new Logger('CORS')
 
 function getCorsOptions() {
   if (process.env.NODE_ENV !== 'production') {
@@ -29,15 +32,15 @@ function getCorsOptions() {
     : []
 
   if (allowedOrigins.length === 0) {
-    console.warn(
-      '⚠️  CORS: No ALLOWED_ORIGINS set in production. Only same-origin requests will be allowed. Set ALLOWED_ORIGINS in your env file to allow cross-origin requests.'
+    corsLogger.warn(
+      'No ALLOWED_ORIGINS set in production. Only same-origin requests will be allowed. Set ALLOWED_ORIGINS in your env file to allow cross-origin requests.'
     )
     return { origin: false as const, credentials: true }
   }
 
   const allowedSet = new Set(allowedOrigins)
-  console.log(
-    `CORS: Allowing origins: ${allowedOrigins.join(', ')}`
+  corsLogger.log(
+    `Allowing origins: ${allowedOrigins.join(', ')}`
   )
   return {
     origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
@@ -52,10 +55,16 @@ function getCorsOptions() {
 }
 
 async function bootstrap() {
+  const appLogger = new AppLoggerService('Manifest', {
+    logLevels: getLogLevels()
+  })
+
   const app = await NestFactory.create(AppModule, {
     cors: getCorsOptions(),
-    logger: ['error', 'warn']
+    bufferLogs: true
   })
+
+  app.useLogger(appLogger)
 
   // Get the underlying Express instance and disable X-Powered-By header.
   app.getHttpAdapter().getInstance().disable('x-powered-by')

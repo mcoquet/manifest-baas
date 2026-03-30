@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { YamlService } from '../services/yaml.service'
 import * as fs from 'fs'
@@ -109,12 +110,12 @@ describe('YamlService', () => {
       expect(result).toBe('test test')
     })
 
-    it('should console warn when env var is undefined', () => {
-      jest.spyOn(console, 'warn').mockImplementation(() => {})
+    it('should warn via logger when env var is undefined', () => {
+      jest.spyOn(Logger.prototype, 'warn').mockImplementation(() => {})
 
       service.interpolateDotEnvVariables('test ${UNDEFINED_ENV_VAR}')
 
-      expect(console.warn).toHaveBeenCalledWith(
+      expect(Logger.prototype.warn).toHaveBeenCalledWith(
         expect.stringContaining('not defined')
       )
     })

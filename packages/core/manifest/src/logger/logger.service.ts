@@ -9,9 +9,10 @@ export class LoggerService {
   constructor(private configService: ConfigService) {}
 
   /**
+   * Displays a formatted startup banner on app initialization.
    *
-   * Displays message on app initialization.
-   *
+   * NOTE: This method intentionally uses console.log for chalk-colored
+   * box-drawing output. This is startup UX, not application logging.
    */
   initMessage(): void {
     const baseUrl: string = this.configService.get('baseUrl')

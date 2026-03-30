@@ -9,7 +9,7 @@ import {
   RelationshipManifest
 } from '@repo/types'
 
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 import { DataSource, EntityMetadata, QueryRunner, Repository } from 'typeorm'
 import { EntityService } from '../../entity/services/entity.service'
 
@@ -33,6 +33,7 @@ import { EntityManifestService } from '../../manifest/services/entity-manifest.s
 
 @Injectable()
 export class SeederService {
+  private readonly logger = new Logger(SeederService.name)
   seededFiles: { [key: string]: string } = {}
   seededImages: { [key: string]: { [key: string]: string } } = {}
   records: { [key: string]: BaseEntity[] } = {}
@@ -137,8 +138,8 @@ export class SeederService {
         })
 
       if (!entityManifest.nested) {
-        console.log(
-          `✅ Seeding ${entityManifest.seedCount} ${entityManifest.seedCount > 1 ? entityManifest.namePlural : entityManifest.nameSingular}...`
+        this.logger.log(
+          `Seeding ${entityManifest.seedCount} ${entityManifest.seedCount > 1 ? entityManifest.namePlural : entityManifest.nameSingular}...`
         )
       }
 
@@ -390,12 +391,12 @@ export class SeederService {
     const password =
       process.env.ADMIN_PASSWORD || randomBytes(16).toString('base64url')
 
-    console.log(`✅ Seeding default admin...`)
-    console.log(`   Email:    ${email}`)
+    this.logger.log(`Seeding default admin...`)
+    this.logger.log(`   Email:    ${email}`)
     if (!process.env.ADMIN_PASSWORD) {
-      console.log(`   Password: ${password}`)
-      console.log(
-        `   ⚠️  Save this password now! Set ADMIN_PASSWORD env var to use a fixed password.`
+      this.logger.log(`   Password: ${password}`)
+      this.logger.warn(
+        'Save this password now! Set ADMIN_PASSWORD env var to use a fixed password.'
       )
     }
 
