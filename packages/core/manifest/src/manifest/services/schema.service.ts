@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 
 import {
   Manifest,
@@ -16,6 +16,7 @@ import { RelationshipManifestService } from './relationship-manifest.service'
 
 @Injectable()
 export class SchemaService {
+  private readonly logger = new Logger(SchemaService.name)
   /**
    *
    * Validate the manifest against the JSON schema and custom logic.
@@ -50,12 +51,12 @@ export class SchemaService {
     const valid = validate(manifest)
 
     if (!valid) {
-      console.log(
+      this.logger.error(
         chalk.red('JSON Schema Validation failed. Please fix the following:')
       )
 
       validate.errors.forEach((error: any) => {
-        console.log(chalk.red(JSON.stringify(error, null, 2)))
+        this.logger.error(chalk.red(JSON.stringify(error, null, 2)))
       })
       process.exit(1)
     }
@@ -184,30 +185,30 @@ export class SchemaService {
    * @param message The error message to log.
    */
   logValidationError(message: string): void {
-    console.log('')
-    console.log(
+    this.logger.error('')
+    this.logger.error(
       chalk.red(
         '┌─────────────────────────────────────────────────────────────┐'
       )
     )
-    console.log(
+    this.logger.error(
       chalk.red('│                      ') +
         chalk.red.bold('VALIDATION FAILED') +
         chalk.red('                      │')
     )
-    console.log(
+    this.logger.error(
       chalk.red(
         '└─────────────────────────────────────────────────────────────┘'
       )
     )
-    console.log('')
-    console.log(chalk.red('❌ ') + chalk.bold('Error: ') + chalk.white(message))
-    console.log('')
-    console.log(
+    this.logger.error('')
+    this.logger.error(chalk.red('❌ ') + chalk.bold('Error: ') + chalk.white(message))
+    this.logger.error('')
+    this.logger.error(
       chalk.yellow('💡 ') +
         chalk.dim('Please fix the above issue and try again.')
     )
-    console.log('')
+    this.logger.error('')
     process.exit(1)
   }
 

@@ -1,3 +1,4 @@
+import { Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { HookService } from '../hook.service'
 import { HookManifest, HookSchema } from '../../../../types/src'
@@ -17,13 +18,15 @@ describe('HookService', () => {
   }
 
   beforeAll(() => {
-    // Prevent console.error from cluttering the test output (fails voluntarily on fetch).
+    // Prevent Logger.error from cluttering the test output (fails voluntarily on fetch).
     originalConsoleError = console.error
     console.error = jest.fn()
+    jest.spyOn(Logger.prototype, 'error').mockImplementation(() => {})
   })
 
   afterAll(() => {
     console.error = originalConsoleError
+    jest.restoreAllMocks()
   })
 
   beforeAll(() => {

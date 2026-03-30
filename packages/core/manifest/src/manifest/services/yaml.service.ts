@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, Logger } from '@nestjs/common'
 
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
@@ -7,6 +7,7 @@ import { Manifest } from '@repo/types'
 
 @Injectable()
 export class YamlService {
+  private readonly logger = new Logger(YamlService.name)
   /**
    *
    * Load the manifest from the YML file, transform it into a Manifest object and store it in the service.
@@ -87,7 +88,7 @@ export class YamlService {
     return yamlContent.replace(/\$\{\s*(\w+)\s*}/g, (match, varName) => {
       const value = process.env[varName]
       if (value === undefined) {
-        console.warn(`Warning: Environment variable ${varName} is not defined.`)
+        this.logger.warn(`Environment variable ${varName} is not defined.`)
       }
       return value || match
     })

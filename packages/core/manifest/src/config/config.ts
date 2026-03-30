@@ -7,14 +7,17 @@ import {
 } from '../constants'
 import path from 'path'
 import { randomBytes } from 'crypto'
+import { Logger } from '@nestjs/common'
+
+const configLogger = new Logger('Config')
 
 function getTokenSecretKey(): string {
   if (process.env.TOKEN_SECRET_KEY) {
     return process.env.TOKEN_SECRET_KEY
   }
   const generated = randomBytes(32).toString('hex')
-  console.warn(
-    '⚠️  No TOKEN_SECRET_KEY set. Using a random secret — tokens will not persist across restarts. Set TOKEN_SECRET_KEY in your env file for stable tokens.'
+  configLogger.warn(
+    'No TOKEN_SECRET_KEY set. Using a random secret — tokens will not persist across restarts. Set TOKEN_SECRET_KEY in your env file for stable tokens.'
   )
   return generated
 }
