@@ -1,6 +1,6 @@
 # Story: Move Dev-Only Packages Out of Production Dependencies
 
-Status: ready-for-dev
+Status: review
 
 ## Story
 
@@ -24,28 +24,28 @@ so that **install size is reduced (~7MB+), attack surface is smaller, and the de
 
 ## Tasks / Subtasks
 
-- [ ] Task 1: Remove unused packages (AC: #2, #6, #7)
-  - [ ] Remove `mock-fs` from `dependencies`
-  - [ ] Remove `fs` from `devDependencies`
-  - [ ] Remove `path` from `devDependencies`
+- [x] Task 1: Remove unused packages (AC: #2, #6, #7)
+  - [x] Remove `mock-fs` from `dependencies`
+  - [x] Remove `fs` from `devDependencies`
+  - [x] Remove `path` from `devDependencies`
 
-- [ ] Task 2: Move dev-only CLI tools to devDependencies (AC: #3)
-  - [ ] Move `nodemon` from `dependencies` to `devDependencies`
+- [x] Task 2: Move dev-only CLI tools to devDependencies (AC: #3)
+  - [x] Move `nodemon` from `dependencies` to `devDependencies`
 
-- [ ] Task 3: Move livereload packages to devDependencies (AC: #4, #5)
-  - [ ] Move `livereload` from `dependencies` to `devDependencies`
-  - [ ] Move `connect-livereload` from `dependencies` to `devDependencies`
-  - [ ] Convert static imports in `main.ts` to dynamic `import()` behind the `!isProduction && !isTest` guard
+- [x] Task 3: Move livereload packages to devDependencies (AC: #4, #5)
+  - [x] Move `livereload` from `dependencies` to `devDependencies`
+  - [x] Move `connect-livereload` from `dependencies` to `devDependencies`
+  - [x] Convert static imports in `main.ts` to dynamic `import()` behind the `!isProduction && !isTest` guard
 
-- [ ] Task 4: Handle @faker-js/faker (AC: #1, #11)
-  - [ ] Move `@faker-js/faker` from `dependencies` to `devDependencies`
-  - [ ] Convert static import in `seed/services/seeder.service.ts` to dynamic `import()` so seeding works when faker is installed
-  - [ ] Handle the case where faker is not installed (clear error message)
+- [x] Task 4: Handle @faker-js/faker (AC: #1, #11)
+  - [x] Move `@faker-js/faker` from `dependencies` to `devDependencies`
+  - [x] Convert static import in `seed/services/seeder.service.ts` to dynamic `import()` so seeding works when faker is installed
+  - [x] Handle the case where faker is not installed (clear error message)
 
-- [ ] Task 5: Validate (AC: #8, #9, #10)
-  - [ ] Run `npm run build` and verify success
-  - [ ] Run tests and verify pass
-  - [ ] Verify dev scripts work
+- [x] Task 5: Validate (AC: #8, #9, #10)
+  - [x] Run `npm run build` and verify success
+  - [x] Run tests and verify pass
+  - [x] Verify dev scripts work
 
 ## Dev Notes
 
@@ -123,4 +123,20 @@ Claude Opus 4.6
 Story created from GitHub Issue #8 analysis with full codebase investigation.
 Ultimate context engine analysis completed — comprehensive developer guide created.
 
+Implementation completed:
+- Removed mock-fs (unused), fs npm package, path npm package
+- Moved nodemon, livereload, connect-livereload, @faker-js/faker to devDependencies
+- Converted livereload/connect-livereload to dynamic imports in main.ts (inside existing !isProduction && !isTest guard)
+- Converted faker to dynamic import with lazy loading in seeder.service.ts (loadFaker method with clear error if not installed)
+- Added loadFaker() calls to seedProperty and seedRelationships for test compatibility
+- Build succeeds, all 469 unit tests pass
+
+### Change Log
+
+- 2026-03-30: Implemented all tasks — moved dev packages, converted to dynamic imports
+
 ### File List
+
+- packages/core/manifest/package.json
+- packages/core/manifest/src/main.ts
+- packages/core/manifest/src/seed/services/seeder.service.ts
