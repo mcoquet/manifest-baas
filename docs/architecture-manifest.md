@@ -192,7 +192,7 @@ Policies are defined per-entity per-operation in `manifest.yml`:
 | `forbidden` | Access denied |
 
 ### Security Features
-- CORS enabled globally
+- CORS: permissive in dev/test, whitelist-based in production via `ALLOWED_ORIGINS`
 - X-Powered-By header removed
 - Global ValidationPipe (DTO validation)
 - 50MB payload limit
@@ -224,11 +224,12 @@ Policies are defined per-entity per-operation in `manifest.yml`:
 | `S3_BUCKET` | — | S3 bucket name |
 | `S3_ENDPOINT` | — | S3 endpoint URL |
 | `S3_REGION` | — | S3 region |
+| `ALLOWED_ORIGINS` | — | Comma-separated list of allowed CORS origins in production (e.g. `https://app.example.com,https://admin.example.com`). In dev/test all origins are allowed. In production with no value set, only same-origin requests are permitted |
 | `OPEN_API_DOCS` | false | Generate OpenAPI spec |
 
 ## Bootstrap Flow
 
-1. `NestFactory.create(AppModule)` with CORS
+1. `NestFactory.create(AppModule)` with environment-aware CORS configuration
 2. Disable X-Powered-By header
 3. Set global API prefix `/api`
 4. Register global ValidationPipe

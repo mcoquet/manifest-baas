@@ -19,9 +19,41 @@ import { OpenApiService } from './open-api/services/open-api.service'
 import { EntityTypeService } from './entity/services/entity-type.service'
 import { EntityTsTypeInfo } from './entity/types/entity-ts-type-info'
 
+function getCorsOptions() {
+  if (process.env.NODE_ENV !== 'production') {
+    return true
+  }
+
+  const allowedOrigins = process.env.ALLOWED_ORIGINS
+    ? process.env.ALLOWED_ORIGINS.split(',').map((o) => o.trim()).filter(Boolean)
+    : []
+
+  if (allowedOrigins.length === 0) {
+    console.warn(
+      '⚠️  CORS: No ALLOWED_ORIGINS set in production. Only same-origin requests will be allowed. Set ALLOWED_ORIGINS in your env file to allow cross-origin requests.'
+    )
+    return { origin: false as const, credentials: true }
+  }
+
+  const allowedSet = new Set(allowedOrigins)
+  console.log(
+    `CORS: Allowing origins: ${allowedOrigins.join(', ')}`
+  )
+  return {
+    origin: (origin: string | undefined, callback: (err: Error | null, allow?: boolean) => void) => {
+      if (!origin || allowedSet.has(origin)) {
+        callback(null, true)
+      } else {
+        callback(new Error('Not allowed by CORS'))
+      }
+    },
+    credentials: true
+  }
+}
+
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    cors: true,
+    cors: getCorsOptions(),
     logger: ['error', 'warn']
   })
 

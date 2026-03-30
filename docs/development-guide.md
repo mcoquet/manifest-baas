@@ -113,6 +113,14 @@ TOKEN_SECRET_KEY=any-dev-secret
 DB_CONNECTION=sqlite
 ```
 
+For production, also configure CORS origins:
+```bash
+NODE_ENV=production
+ALLOWED_ORIGINS=https://app.example.com,https://admin.example.com
+```
+
+In development and test environments, CORS allows all origins. In production without `ALLOWED_ORIGINS`, only same-origin requests are permitted.
+
 For contribution mode:
 ```bash
 # Uses .env.contribution
