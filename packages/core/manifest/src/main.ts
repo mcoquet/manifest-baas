@@ -2,9 +2,7 @@ import { Logger, ValidationPipe } from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { NestFactory } from '@nestjs/core'
 import { OpenAPIObject, SwaggerModule } from '@nestjs/swagger'
-import connectLiveReload from 'connect-livereload'
 import * as express from 'express'
-import * as livereload from 'livereload'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 import { readFileSync } from 'fs'
@@ -87,13 +85,19 @@ async function bootstrap() {
 
   // Reload the browser when server files change.
   if (!isProduction && !isTest) {
-    const liveReloadServer = livereload.createServer()
-    liveReloadServer.server.once('connection', () => {
-      setTimeout(() => {
-        liveReloadServer.refresh('/')
-      }, 100)
-    })
-    app.use(connectLiveReload())
+    try {
+      const livereloadModule = await import('livereload')
+      const connectLiveReloadModule = await import('connect-livereload')
+      const liveReloadServer = livereloadModule.createServer()
+      liveReloadServer.server.once('connection', () => {
+        setTimeout(() => {
+          liveReloadServer.refresh('/')
+        }, 100)
+      })
+      app.use(connectLiveReloadModule.default())
+    } catch {
+      appLogger.warn('livereload not available — install livereload and connect-livereload as devDependencies for browser auto-refresh')
+    }
   }
 
   const adminPanelFolder: string = configService.get('paths').adminPanelFolder

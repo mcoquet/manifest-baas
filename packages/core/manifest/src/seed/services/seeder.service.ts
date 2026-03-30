@@ -13,7 +13,7 @@ import { Injectable, Logger } from '@nestjs/common'
 import { DataSource, EntityMetadata, QueryRunner, Repository } from 'typeorm'
 import { EntityService } from '../../entity/services/entity.service'
 
-import { faker } from '@faker-js/faker'
+import type { Faker } from '@faker-js/faker'
 import * as fs from 'fs'
 import * as path from 'path'
 import bcrypt from 'bcryptjs'
@@ -34,6 +34,7 @@ import { EntityManifestService } from '../../manifest/services/entity-manifest.s
 @Injectable()
 export class SeederService {
   private readonly logger = new Logger(SeederService.name)
+  private faker!: Faker
   seededFiles: { [key: string]: string } = {}
   seededImages: { [key: string]: { [key: string]: string } } = {}
   records: { [key: string]: BaseEntity[] } = {}
@@ -45,6 +46,18 @@ export class SeederService {
     private dataSource: DataSource
   ) {}
 
+  private async loadFaker(): Promise<void> {
+    if (this.faker) return
+    try {
+      const fakerModule = await import('@faker-js/faker')
+      this.faker = fakerModule.faker
+    } catch {
+      throw new Error(
+        '@faker-js/faker is not installed. Install it with: npm install -D @faker-js/faker'
+      )
+    }
+  }
+
   /**
    * Seed the database with dummy data.
    *
@@ -54,6 +67,8 @@ export class SeederService {
    *
    */
   async seed(tableName?: string): Promise<void> {
+    await this.loadFaker()
+
     let entityMetadatas: EntityMetadata[] =
       this.entityService.getEntityMetadatas()
 
@@ -176,7 +191,7 @@ export class SeederService {
             // Get a random many to one relationship.
             manyToOneRelationships = [
               manyToOneRelationships[
-                faker.number.int({
+                this.faker.number.int({
                   min: 0,
                   max: manyToOneRelationships.length - 1
                 })
@@ -187,7 +202,7 @@ export class SeederService {
             // Get a random one to one relationship.
             oneToOneRelationships = [
               oneToOneRelationships[
-                faker.number.int({
+                this.faker.number.int({
                   min: 0,
                   max: oneToOneRelationships.length - 1
                 })
@@ -262,19 +277,20 @@ export class SeederService {
     propertyManifest: PropertyManifest,
     entityManifest: EntityManifest
   ): Promise<string | number | boolean | object | unknown> {
+    await this.loadFaker()
     const typeHandlers: { [key: string]: () => Promise<unknown> } = {
-      [PropType.String]: () => Promise.resolve(faker.commerce.product()),
-      [PropType.Number]: () => Promise.resolve(faker.number.int({ max: 50 })),
+      [PropType.String]: () => Promise.resolve(this.faker.commerce.product()),
+      [PropType.Number]: () => Promise.resolve(this.faker.number.int({ max: 50 })),
       [PropType.Link]: () => Promise.resolve('https://manifest.build'),
       [PropType.Text]: () =>
-        Promise.resolve(faker.commerce.productDescription()),
+        Promise.resolve(this.faker.commerce.productDescription()),
       [PropType.RichText]: () => Promise.resolve(this.seedRichText()),
       [PropType.Money]: () =>
-        Promise.resolve(faker.finance.amount({ min: 1, max: 500, dec: 2 })),
-      [PropType.Date]: () => Promise.resolve(faker.date.past()),
-      [PropType.Timestamp]: () => Promise.resolve(faker.date.recent()),
-      [PropType.Email]: () => Promise.resolve(faker.internet.email()),
-      [PropType.Boolean]: () => Promise.resolve(faker.datatype.boolean()),
+        Promise.resolve(this.faker.finance.amount({ min: 1, max: 500, dec: 2 })),
+      [PropType.Date]: () => Promise.resolve(this.faker.date.past()),
+      [PropType.Timestamp]: () => Promise.resolve(this.faker.date.recent()),
+      [PropType.Email]: () => Promise.resolve(this.faker.internet.email()),
+      [PropType.Boolean]: () => Promise.resolve(this.faker.datatype.boolean()),
       [PropType.Password]: () =>
         Promise.resolve(bcrypt.hashSync('manifest', 1)),
       [PropType.Choice]: () =>
@@ -296,20 +312,20 @@ export class SeederService {
 
   private seedRichText(): string {
     return `
-      <h1>${faker.commerce.productName()}</h1>
+      <h1>${this.faker.commerce.productName()}</h1>
       <p>This is a dummy HTML content with <a href="https://manifest.build">links</a> and <strong>bold text</strong></p>
       <ul>
-        <li>${faker.commerce.productAdjective()}</li>
-        <li>${faker.commerce.productAdjective()}</li>
-        <li>${faker.commerce.productAdjective()}</li>
+        <li>${this.faker.commerce.productAdjective()}</li>
+        <li>${this.faker.commerce.productAdjective()}</li>
+        <li>${this.faker.commerce.productAdjective()}</li>
       </ul>
-      <h2>${faker.commerce.productName()}</h2>
-      <p>${faker.commerce.productDescription()}<p>
+      <h2>${this.faker.commerce.productName()}</h2>
+      <p>${this.faker.commerce.productDescription()}<p>
     `
   }
 
   private seedChoice(propertyManifest: PropertyManifest): unknown {
-    return faker.helpers.arrayElement(
+    return this.faker.helpers.arrayElement(
       propertyManifest.options.values as unknown[]
     )
   }
@@ -374,8 +390,8 @@ export class SeederService {
 
   private seedLocation(): { lat: number; lng: number } {
     return {
-      lat: faker.location.latitude(),
-      lng: faker.location.longitude()
+      lat: this.faker.location.latitude(),
+      lng: this.faker.location.longitude()
     }
   }
 
@@ -419,6 +435,7 @@ export class SeederService {
   async seedRelationships(
     relationshipManifest: RelationshipManifest
   ): Promise<string | { id: string }[]> {
+    await this.loadFaker()
     const relatedEntityRepository: Repository<BaseEntity> =
       this.entityService.getEntityRepository({
         entityMetadata: this.entityService.getEntityMetadata({
@@ -448,7 +465,7 @@ export class SeederService {
         this.records[relationshipManifest.entity].length
       )
 
-      const numberOfRelations: number = faker.number.int({
+      const numberOfRelations: number = this.faker.number.int({
         min: 0,
         max
       })
