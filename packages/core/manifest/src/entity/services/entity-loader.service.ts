@@ -14,10 +14,12 @@ import {
   EntitySchemaColumnOptions,
   ValueTransformer
 } from 'typeorm'
-import { sqlitePropTypeColumnTypes } from '../columns/sqlite-prop-type-column-types'
+import {
+  sqlitePropTypeColumnTypes,
+  mysqlPropTypeColumnTypes,
+  postgresPropTypeColumnTypes
+} from '../columns/prop-type-column-types'
 import { RelationshipService } from './relationship.service'
-import { mysqlPropTypeColumnTypes } from '../columns/mysql-prop-type-column-types'
-import { postgresPropTypeColumnTypes } from '../columns/postgres-prop-type-column-types copy'
 import { ColumnService } from './column.service'
 import { BooleanTransformer } from '../transformers/boolean-transformer'
 import { NumberTransformer } from '../transformers/number-transformer'

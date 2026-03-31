@@ -128,7 +128,7 @@ export class AppModule {
   }
 
   private async init() {
-    const isSeed: boolean = process.argv[1].includes('seed')
+    const isSeed: boolean = process.env.MANIFEST_SEED === 'true'
     const isTest: boolean = process.env.NODE_ENV === 'test'
 
     if (!isSeed && !isTest) {

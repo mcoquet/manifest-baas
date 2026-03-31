@@ -1,9 +1,11 @@
 import { Injectable } from '@nestjs/common'
 import { DatabaseConnection, PropType } from '../../../../types/src'
 import { ColumnType } from 'typeorm'
-import { sqlitePropTypeColumnTypes } from '../columns/sqlite-prop-type-column-types'
-import { postgresPropTypeColumnTypes } from '../columns/postgres-prop-type-column-types copy'
-import { mysqlPropTypeColumnTypes } from '../columns/mysql-prop-type-column-types'
+import {
+  sqlitePropTypeColumnTypes,
+  postgresPropTypeColumnTypes,
+  mysqlPropTypeColumnTypes
+} from '../columns/prop-type-column-types'
 
 @Injectable()
 export class ColumnService {
