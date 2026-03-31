@@ -8,8 +8,8 @@ import { BaseCrudInterceptor } from '../crud/base-crud.interceptor'
 @Injectable()
 export class MiddlewareInterceptor extends BaseCrudInterceptor {
   constructor(
-    readonly eventService: EventService,
-    readonly entityManifestService: EntityManifestService,
+    protected readonly eventService: EventService,
+    protected readonly entityManifestService: EntityManifestService,
     private readonly handlerService: HandlerService
   ) {
     super(eventService, entityManifestService)

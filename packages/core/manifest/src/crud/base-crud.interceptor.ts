@@ -23,21 +23,15 @@ export abstract class BaseCrudInterceptor implements NestInterceptor {
   ) {}
 
   protected resolveEventContext(context: ExecutionContext): CrudEventContext {
+    const handlerName = context.getHandler().name as
+      | keyof CollectionController
+      | keyof SingleController
+
     const beforeRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'before'
-      )
+      this.eventService.getRelatedCrudEvent(handlerName, 'before')
 
     const afterRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'after'
-      )
+      this.eventService.getRelatedCrudEvent(handlerName, 'after')
 
     let entityManifest: EntityManifest | undefined
     if (beforeRequestEvent || afterRequestEvent) {

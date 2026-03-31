@@ -9,8 +9,8 @@ import { BaseCrudInterceptor } from '../crud/base-crud.interceptor'
 @Injectable()
 export class HookInterceptor extends BaseCrudInterceptor {
   constructor(
-    readonly eventService: EventService,
-    readonly entityManifestService: EntityManifestService,
+    protected readonly eventService: EventService,
+    protected readonly entityManifestService: EntityManifestService,
     private readonly hookService: HookService
   ) {
     super(eventService, entityManifestService)
