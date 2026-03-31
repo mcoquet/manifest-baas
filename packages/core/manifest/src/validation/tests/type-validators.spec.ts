@@ -425,17 +425,89 @@ describe('Validators for property types', () => {
     )
   })
 
-  it('file, image and nested types always return null', async () => {
-    const types = [PropType.File, PropType.Image, PropType.Nested]
+  it('file type expects a string value (file reference)', async () => {
+    const goodValues = ['/uploads/file.pdf', 'https://example.com/file.pdf', '']
+    const badValues = [1, true, {}, []]
 
-    const goodValidations = types.map((type) =>
-      service.validateProperty(null, {
+    const goodValidations = goodValues.map((value) =>
+      service.validateProperty(value, {
         name: 'test',
-        type
+        type: PropType.File
+      })
+    )
+
+    const badValidations = badValues.map((value) =>
+      service.validateProperty(value, {
+        name: 'test',
+        type: PropType.File
       })
     )
 
     expect(goodValidations.every((validation) => validation.length === 0)).toBe(
+      true
+    )
+    expect(badValidations.every((validation) => validation.length === 1)).toBe(
+      true
+    )
+  })
+
+  it('image type expects a string value (image reference)', async () => {
+    const goodValues = [
+      '/uploads/photo.jpg',
+      'https://example.com/image.png',
+      ''
+    ]
+    const badValues = [1, true, {}, []]
+
+    const goodValidations = goodValues.map((value) =>
+      service.validateProperty(value, {
+        name: 'test',
+        type: PropType.Image
+      })
+    )
+
+    const badValidations = badValues.map((value) =>
+      service.validateProperty(value, {
+        name: 'test',
+        type: PropType.Image
+      })
+    )
+
+    expect(goodValidations.every((validation) => validation.length === 0)).toBe(
+      true
+    )
+    expect(badValidations.every((validation) => validation.length === 1)).toBe(
+      true
+    )
+  })
+
+  it('nested type expects an object or array of objects', async () => {
+    const goodValues = [
+      { name: 'child' },
+      [{ name: 'child1' }, { name: 'child2' }],
+      [],
+      {}
+    ]
+    const badValues = ['string', 1, true, [1, 2], ['string']]
+
+    const goodValidations = goodValues.map((value) =>
+      service.validateProperty(value, {
+        name: 'test',
+        type: PropType.Nested
+      })
+    )
+
+    const badValidations = badValues.map((value) =>
+      service.validateProperty(value, {
+        name: 'test',
+        type: PropType.Nested
+      })
+    )
+
+    expect(goodValidations.every((validation) => validation.length === 0)).toBe(
+      true
+    )
+    expect(badValidations.every((validation) => validation.length === 1)).toBe(
       true
     )
   })

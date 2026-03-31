@@ -74,7 +74,21 @@ export const typeValidators: Record<
       ? null
       : 'The value must be a valid latitude and longitude',
 
-  [PropType.File]: () => null, // TODO: Type validators for files
-  [PropType.Image]: () => null, // TODO: Type validators for images
-  [PropType.Nested]: () => null // TODO: Type validators for groups
+  [PropType.File]: (value: unknown): string | null =>
+    isString(value) ? null : 'The value must be a valid file reference',
+
+  [PropType.Image]: (value: unknown): string | null =>
+    isString(value) ? null : 'The value must be a valid image reference',
+
+  [PropType.Nested]: (value: unknown): string | null => {
+    if (Array.isArray(value)) {
+      return value.every((item) => typeof item === 'object' && item !== null)
+        ? null
+        : 'The value must be an array of objects'
+    }
+    if (typeof value === 'object' && value !== null) {
+      return null
+    }
+    return 'The value must be an object or an array of objects'
+  }
 }
