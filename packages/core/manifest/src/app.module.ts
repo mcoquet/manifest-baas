@@ -30,6 +30,7 @@ import { EventModule } from './event/event.module'
 
 import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOptions'
 import config from './config/config'
+import { validateEnvironment } from './config/env.validation'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
 import { APP_GUARD } from '@nestjs/core'
 
@@ -38,7 +39,8 @@ import { APP_GUARD } from '@nestjs/core'
     ConfigModule.forRoot({
       isGlobal: true,
       envFilePath: ['.env', '.env.contribution'],
-      load: [config]
+      load: [config],
+      validate: validateEnvironment
     }),
     TypeOrmModule.forRootAsync({
       imports: [ConfigModule, EntityModule, ManifestModule],
