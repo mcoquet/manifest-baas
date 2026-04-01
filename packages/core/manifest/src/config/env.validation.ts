@@ -3,17 +3,10 @@ import { z } from 'zod'
 
 const validationLogger = new Logger('EnvValidation')
 
-/**
- * Non-empty string helper — treats empty string the same as undefined.
- */
+// Treats empty string the same as undefined — z.string() alone allows ''.
 const requiredString = (message: string) =>
-  z
-    .string({ message })
-    .min(1, message)
+  z.string({ message }).min(1, message)
 
-/**
- * Base schema applied in all environments.
- */
 const baseSchema = z.object({
   NODE_ENV: z
     .enum(['production', 'development', 'test', 'contribution'])
@@ -36,6 +29,7 @@ const baseSchema = z.object({
   DB_SSL_REJECT_UNAUTHORIZED: z.string().optional(),
   DB_DROP_SCHEMA: z.string().optional(),
   DB_SYNCHRONIZE: z.string().optional(),
+  MIGRATIONS_RUN: z.string().optional(),
 
   // S3
   S3_BUCKET: z.string().optional(),
@@ -49,6 +43,7 @@ const baseSchema = z.object({
   MANIFEST_FILE_PATH: z.string().optional(),
   PUBLIC_FOLDER: z.string().optional(),
   MANIFEST_HANDLERS_FOLDER: z.string().optional(),
+  MIGRATIONS_DIR: z.string().optional(),
 
   // Admin / Seeding
   ADMIN_EMAIL: z.string().optional(),
@@ -58,9 +53,6 @@ const baseSchema = z.object({
 
 type EnvConfig = z.infer<typeof baseSchema>
 
-/**
- * Production-only requirements: TOKEN_SECRET_KEY and BASE_URL are mandatory.
- */
 const productionSchema = baseSchema.extend({
   TOKEN_SECRET_KEY: requiredString(
     'TOKEN_SECRET_KEY is required in production. Set a custom secret in your env file.'
@@ -81,10 +73,7 @@ function requireField(
   }
 }
 
-/**
- * When DB_CONNECTION is postgres or mysql, require database credentials.
- * Applied in all environments since missing credentials cause runtime failures.
- */
+// Applied in all environments: missing credentials cause runtime failures, not just prod.
 function validateDatabaseConfig(data: EnvConfig, ctx: z.RefinementCtx): void {
   const db = data.DB_CONNECTION
   if (db !== 'postgres' && db !== 'mysql') return
@@ -110,10 +99,7 @@ function validateDatabaseConfig(data: EnvConfig, ctx: z.RefinementCtx): void {
   )
 }
 
-/**
- * When S3_BUCKET is set, require the S3 credentials.
- * Applied in all environments since a misconfigured S3 will fail at runtime.
- */
+// Applied in all environments: misconfigured S3 fails at runtime, not just prod.
 function validateS3Config(data: EnvConfig, ctx: z.RefinementCtx): void {
   if (!data.S3_BUCKET) return
 
@@ -148,7 +134,6 @@ function emitDevWarnings(data: EnvConfig): void {
       'BASE_URL is not set. Defaulting to http://localhost.'
     )
   }
-
 }
 
 function formatErrors(error: z.ZodError): string {
@@ -168,17 +153,11 @@ export function validateEnvironment(
 ): Record<string, unknown> {
   const isProduction = config['NODE_ENV'] === 'production'
 
-  // DB and S3 refinements apply in all environments to catch
-  // misconfigurations that would cause runtime failures.
-  const schema = isProduction
-    ? productionSchema.superRefine((data, ctx) => {
-        validateDatabaseConfig(data, ctx)
-        validateS3Config(data, ctx)
-      })
-    : baseSchema.superRefine((data, ctx) => {
-        validateDatabaseConfig(data, ctx)
-        validateS3Config(data, ctx)
-      })
+  const baseForEnv = isProduction ? productionSchema : baseSchema
+  const schema = baseForEnv.superRefine((data, ctx) => {
+    validateDatabaseConfig(data, ctx)
+    validateS3Config(data, ctx)
+  })
 
   const result = schema.safeParse(config)
 

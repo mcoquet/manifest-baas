@@ -76,7 +76,14 @@ import { APP_GUARD } from '@nestjs/core'
         const entities: EntitySchema[] =
           entityLoaderService.loadEntities(dbConnection)
 
-        return Object.assign(databaseConfig, { entities })
+        const migrationsDir = configService.get('paths').migrationsDir
+
+        return {
+          ...databaseConfig,
+          entities,
+          migrations: [`${migrationsDir}/*{.ts,.js}`],
+          migrationsRun: configService.get('migrations').migrationsRun
+        }
       },
       inject: [ConfigService, EntityLoaderService, ManifestService]
     }),
