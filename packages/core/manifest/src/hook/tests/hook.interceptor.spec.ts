@@ -84,7 +84,7 @@ describe('HookInterceptor', () => {
 
   it('should be defined', () => {
     expect(
-      new HookInterceptor(entityManifestService, hookService, eventService)
+      new HookInterceptor(eventService, entityManifestService, hookService)
     ).toBeDefined()
   })
 

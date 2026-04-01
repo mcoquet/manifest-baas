@@ -1,52 +1,30 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor
-} from '@nestjs/common'
+import { CallHandler, ExecutionContext, Injectable } from '@nestjs/common'
 import { Observable, tap } from 'rxjs'
 import { EventService } from '../event/event.service'
-import { CrudEventName, EntityManifest } from '../../../types/src'
-import { CollectionController } from '../crud/controllers/collection.controller'
-import { SingleController } from '../crud/controllers/single.controller'
 import { EntityManifestService } from '../manifest/services/entity-manifest.service'
 import { HandlerService } from '../handler/handler.service'
+import { BaseCrudInterceptor } from '../crud/base-crud.interceptor'
 
 @Injectable()
-export class MiddlewareInterceptor implements NestInterceptor {
+export class MiddlewareInterceptor extends BaseCrudInterceptor {
   constructor(
-    private readonly eventService: EventService,
-    private readonly entityManifestService: EntityManifestService,
+    protected readonly eventService: EventService,
+    protected readonly entityManifestService: EntityManifestService,
     private readonly handlerService: HandlerService
-  ) {}
+  ) {
+    super(eventService, entityManifestService)
+  }
 
   async intercept(
     context: ExecutionContext,
     next: CallHandler
   ): Promise<Observable<unknown>> {
-    let entityManifest: EntityManifest
+    const { entityManifest, beforeRequestEvent, afterRequestEvent } =
+      this.resolveEventContext(context)
 
-    const beforeRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'before'
-      )
-
-    const afterRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'after'
-      )
-
-    if (beforeRequestEvent || afterRequestEvent) {
-      entityManifest = this.entityManifestService.getEntityManifest({
-        slug: context.getArgs()[0].params.entity
-      })
-    }
+    const httpContext = context.switchToHttp()
+    const req = httpContext.getRequest()
+    const res = httpContext.getResponse()
 
     if (beforeRequestEvent) {
       for (const middleware of entityManifest.middlewares?.[
@@ -54,8 +32,8 @@ export class MiddlewareInterceptor implements NestInterceptor {
       ] || []) {
         await this.handlerService.trigger({
           path: middleware.handler,
-          req: context.switchToHttp().getRequest(),
-          res: context.switchToHttp().getResponse()
+          req,
+          res
         })
       }
     }
@@ -68,8 +46,8 @@ export class MiddlewareInterceptor implements NestInterceptor {
           ] || []) {
             await this.handlerService.trigger({
               path: middleware.handler,
-              req: context.switchToHttp().getRequest(),
-              res: context.switchToHttp().getResponse()
+              req,
+              res
             })
           }
         }

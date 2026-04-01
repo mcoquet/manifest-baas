@@ -1,55 +1,29 @@
-import {
-  CallHandler,
-  ExecutionContext,
-  Injectable,
-  NestInterceptor
-} from '@nestjs/common'
+import { CallHandler, ExecutionContext, Injectable } from '@nestjs/common'
 import { Observable, forkJoin, lastValueFrom, tap } from 'rxjs'
-import { EntityManifest, CrudEventName, HookManifest } from '@repo/types'
+import { HookManifest } from '@repo/types'
 import { EntityManifestService } from '../manifest/services/entity-manifest.service'
 import { HookService } from './hook.service'
-import { SingleController } from '../crud/controllers/single.controller'
-import { CollectionController } from '../crud/controllers/collection.controller'
 import { EventService } from '../event/event.service'
+import { BaseCrudInterceptor } from '../crud/base-crud.interceptor'
 
 @Injectable()
-export class HookInterceptor implements NestInterceptor {
+export class HookInterceptor extends BaseCrudInterceptor {
   constructor(
-    private readonly entityManifestService: EntityManifestService,
-    private readonly hookService: HookService,
-    private readonly eventService: EventService
-  ) {}
+    protected readonly eventService: EventService,
+    protected readonly entityManifestService: EntityManifestService,
+    private readonly hookService: HookService
+  ) {
+    super(eventService, entityManifestService)
+  }
 
   async intercept(
     context: ExecutionContext,
     next: CallHandler
-  ): Promise<Observable<any>> {
-    let entityManifest: EntityManifest
-
-    const beforeRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'before'
-      )
-
-    const afterRequestEvent: CrudEventName =
-      this.eventService.getRelatedCrudEvent(
-        context.getHandler().name as
-          | keyof CollectionController
-          | keyof SingleController,
-        'after'
-      )
-
-    if (beforeRequestEvent || afterRequestEvent) {
-      entityManifest = this.entityManifestService.getEntityManifest({
-        slug: context.getArgs()[0].params.entity
-      })
-    }
+  ): Promise<Observable<unknown>> {
+    const { entityManifest, beforeRequestEvent, afterRequestEvent } =
+      this.resolveEventContext(context)
 
     if (beforeRequestEvent) {
-      // Trigger hooks.
       if (entityManifest.hooks?.[beforeRequestEvent]?.length) {
         const request = context.switchToHttp().getRequest()
         const entitySlug: string = request.params.entity
@@ -74,10 +48,7 @@ export class HookInterceptor implements NestInterceptor {
 
     return next.handle().pipe(
       tap(async (data) => {
-        // Get related "after" hook event.
-
         if (afterRequestEvent) {
-          // Trigger hooks.
           if (entityManifest.hooks?.[afterRequestEvent]?.length) {
             const request = context.switchToHttp().getRequest()
             const entitySlug: string = request.params.entity

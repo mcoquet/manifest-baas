@@ -4,6 +4,8 @@ import { AppModule } from '../../app.module'
 import { SeederService } from '../services/seeder.service'
 import { AppLoggerService, getLogLevels } from '../../logger/app-logger.service'
 
+process.env.MANIFEST_SEED = 'true'
+
 async function bootstrap() {
   const logger = new AppLoggerService('Seed', {
     logLevels: getLogLevels()
