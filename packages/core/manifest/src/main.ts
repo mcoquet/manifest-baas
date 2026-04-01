@@ -77,12 +77,6 @@ async function bootstrap() {
   const isProduction: boolean = configService.get('NODE_ENV') === 'production'
   const isTest: boolean = configService.get('NODE_ENV') === 'test'
 
-  if (isProduction && !process.env.TOKEN_SECRET_KEY) {
-    throw new Error(
-      'Token secret key not defined. Please set a custom token secret key to run in production environment adding TOKEN_SECRET_KEY in your env file.'
-    )
-  }
-
   // Reload the browser when server files change.
   if (!isProduction && !isTest) {
     try {
