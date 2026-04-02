@@ -58,11 +58,19 @@ export default (): {
      * This is used for storing custom handlers functions.
      */
     handlersFolder: string
+    /**
+     * The folder where migration files are stored.
+     * Migrations are version-controlled and committed to the repository.
+     */
+    migrationsDir: string
   }
   database: {
     sqlite: SqliteConnectionOptions
     postgres: PostgresConnectionOptions
     mysql: MysqlConnectionOptions
+  }
+  migrations: {
+    migrationsRun: boolean
   }
   storage: {
     s3Bucket: string
@@ -105,12 +113,17 @@ export default (): {
         process.env.MANIFEST_FILE_PATH || `${projectRoot}/manifest.yml`,
       handlersFolder:
         process.env.MANIFEST_HANDLERS_FOLDER ||
-        path.join(projectRoot, 'handlers')
+        path.join(projectRoot, 'handlers'),
+      migrationsDir:
+        process.env.MIGRATIONS_DIR || path.join(projectRoot, 'migrations')
     },
     database: {
       sqlite: getSqliteConnectionOptions(generatedFolder),
       postgres: getPostgresConnectionOptions(),
       mysql: getMysqlConnectionOptions()
+    },
+    migrations: {
+      migrationsRun: getMigrationsRun()
     },
     storage: {
       s3Bucket: process.env.S3_BUCKET,
@@ -139,6 +152,13 @@ function getSynchronize(): boolean {
     return process.env.DB_SYNCHRONIZE === 'true'
   }
   return !isProduction()
+}
+
+function getMigrationsRun(): boolean {
+  if (process.env.MIGRATIONS_RUN !== undefined) {
+    return process.env.MIGRATIONS_RUN === 'true'
+  }
+  return isProduction()
 }
 
 function getSqliteConnectionOptions(
