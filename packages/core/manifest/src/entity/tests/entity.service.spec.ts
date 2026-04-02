@@ -1,3 +1,4 @@
+import { BadRequestException, NotFoundException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { EntityService } from '../services/entity.service'
 import { EntityManifestService } from '../../manifest/services/entity-manifest.service'
@@ -62,8 +63,8 @@ describe('EntityService', () => {
   })
 
   describe('getEntityMetadata', () => {
-    it('should fail if no className or slug is provided', () => {
-      expect(() => service.getEntityMetadata({})).toThrowError()
+    it('should fail with BadRequestException if no className or slug is provided', () => {
+      expect(() => service.getEntityMetadata({})).toThrow(BadRequestException)
     })
 
     it('should get entity metadata by className', () => {
@@ -93,7 +94,7 @@ describe('EntityService', () => {
       expect(result.targetName).toBe('Entity')
     })
 
-    it('should fail if no entity metadata is found', () => {
+    it('should fail with NotFoundException if no entity metadata is found', () => {
       jest.spyOn(entityManifestService, 'getEntityManifest').mockReturnValue({
         className: 'AnotherEntity'
       } as any)
@@ -102,7 +103,7 @@ describe('EntityService', () => {
         service.getEntityMetadata({
           slug: 'entity'
         })
-      ).toThrow()
+      ).toThrow(NotFoundException)
     })
   })
 
@@ -119,8 +120,8 @@ describe('EntityService', () => {
       expect(dataSource.getRepository).toHaveBeenCalledWith('Entity')
     })
 
-    it('should throw an error if no entity metadata is provided', () => {
-      expect(() => service.getEntityRepository({})).toThrow()
+    it('should throw a BadRequestException if no entity metadata is provided', () => {
+      expect(() => service.getEntityRepository({})).toThrow(BadRequestException)
     })
   })
 })

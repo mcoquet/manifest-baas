@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
@@ -23,12 +23,35 @@ export class YamlService {
     if (manifestFilePath.startsWith('http')) {
       fileContent = await this.loadManifestFromUrl(manifestFilePath)
     } else {
-      fileContent = fs.readFileSync(manifestFilePath, 'utf8')
+      try {
+        fileContent = fs.readFileSync(manifestFilePath, 'utf8')
+      } catch (error) {
+        this.logger.error(
+          `Failed to read manifest file at ${manifestFilePath}: ${error instanceof Error ? error.message : error}`
+        )
+        throw new InternalServerErrorException(
+          `Failed to read manifest file at ${manifestFilePath}`
+        )
+      }
     }
 
     fileContent = this.interpolateDotEnvVariables(fileContent)
 
-    const manifestSchema: Manifest = yaml.load(fileContent) as Manifest
+    let manifestSchema: Manifest
+    try {
+      manifestSchema = yaml.load(fileContent) as Manifest
+    } catch (error) {
+      this.logger.error(
+        `Failed to parse manifest YAML: ${error instanceof Error ? error.message : error}`
+      )
+      throw new InternalServerErrorException('Failed to parse manifest YAML')
+    }
+
+    if (!manifestSchema) {
+      throw new InternalServerErrorException(
+        'Manifest YAML is empty or invalid'
+      )
+    }
 
     // Remove emojis from entity keys.
     Object.keys(manifestSchema.entities || []).forEach((key) => {
@@ -52,11 +75,23 @@ export class YamlService {
    *
    **/
   async loadManifestFromUrl(url: string): Promise<string> {
-    const response = await fetch(url).catch(() => {
-      throw new Error(`Failed to fetch the manifest from ${url}`)
+    const response = await fetch(url).catch((error) => {
+      this.logger.error(
+        `Failed to fetch the manifest from ${url}: ${error instanceof Error ? error.message : error}`
+      )
+      throw new InternalServerErrorException(
+        `Failed to fetch the manifest from ${url}`
+      )
     })
 
-    const text = await response.text()
+    const text = await response.text().catch((error) => {
+      this.logger.error(
+        `Failed to read response from ${url}: ${error instanceof Error ? error.message : error}`
+      )
+      throw new InternalServerErrorException(
+        `Failed to read manifest response from ${url}`
+      )
+    })
 
     return text
   }

@@ -1,5 +1,9 @@
 import { BaseEntity } from '@repo/types'
-import { Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException
+} from '@nestjs/common'
 import { DataSource, EntityMetadata, Repository } from 'typeorm'
 import { ColumnMetadata } from 'typeorm/metadata/ColumnMetadata'
 import { EntityManifestService } from '../../manifest/services/entity-manifest.service'
@@ -37,7 +41,7 @@ export class EntityService {
     slug?: string
   }): EntityMetadata {
     if (!className && !slug) {
-      throw new Error('Either className or slug must be provided')
+      throw new BadRequestException('Either className or slug must be provided')
     }
 
     if (slug) {
@@ -53,7 +57,7 @@ export class EntityService {
     )
 
     if (!entityMetadata) {
-      throw new Error(`Entity ${className} not found`)
+      throw new NotFoundException(`Entity ${className} not found`)
     }
 
     return entityMetadata
@@ -116,7 +120,9 @@ export class EntityService {
     entitySlug?: string
   }): Repository<BaseEntity> {
     if (!entityMetadata && !entitySlug) {
-      throw new Error('Either entityMetadata or entitySlug must be provided')
+      throw new BadRequestException(
+        'Either entityMetadata or entitySlug must be provided'
+      )
     }
 
     if (entitySlug) {

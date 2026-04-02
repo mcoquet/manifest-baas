@@ -1,5 +1,6 @@
 import bcrypt from 'bcryptjs'
 import {
+  BadRequestException,
   HttpException,
   HttpStatus,
   Injectable,
@@ -258,7 +259,7 @@ export class CrudService {
       })
 
     if (!entityManifest.single && !id) {
-      throw new Error('Id is required for collections.')
+      throw new BadRequestException('Id is required for collections.')
     }
 
     const entityMetadata: EntityMetadata = this.entityService.getEntityMetadata(
@@ -399,7 +400,7 @@ export class CrudService {
       })
 
     if (!entityManifest.single && !id) {
-      throw new Error('Id is required for collections.')
+      throw new BadRequestException('Id is required for collections.')
     }
 
     const entityRepository: Repository<BaseEntity> =

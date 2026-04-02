@@ -7,6 +7,7 @@ import { ValidationService } from '../../validation/services/validation.service'
 import { RelationshipService } from '../../entity/services/relationship.service'
 import { EntityManifest, Paginator, PropType } from '../../../../types/src'
 import { SelectQueryBuilder } from 'typeorm'
+import { BadRequestException, HttpException } from '@nestjs/common'
 import bcrypt from 'bcryptjs'
 
 describe('CrudService', () => {
@@ -202,14 +203,14 @@ describe('CrudService', () => {
       expect(queryBuilder.orderBy).toHaveBeenCalledWith('entity.name', 'ASC')
     })
 
-    it('should fail if the order by property is not in the entity', async () => {
+    it('should fail with HttpException if the order by property is not in the entity', async () => {
       const entitySlug = 'test'
       await expect(
         service.findAll({
           entitySlug,
           queryParams: { orderBy: 'invalid' }
         })
-      ).rejects.toThrow()
+      ).rejects.toThrow(HttpException)
     })
 
     it('should be able to order by id', async () => {
@@ -330,6 +331,17 @@ describe('CrudService', () => {
       const result = await service.findOne({ entitySlug, id: dummyItem.id })
 
       expect(result).toEqual(dummyItem)
+    })
+
+    it('should throw a BadRequestException if id is missing for collections', async () => {
+      jest.spyOn(entityManifestService, 'getEntityManifest').mockReturnValue({
+        ...dummyEntityManifest,
+        single: false
+      } as any)
+
+      await expect(
+        service.findOne({ entitySlug: 'test' })
+      ).rejects.toThrow(BadRequestException)
     })
 
     it('should throw a 404 error if the entity is not found', async () => {

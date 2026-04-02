@@ -2,6 +2,10 @@ import { Test, TestingModule } from '@nestjs/testing'
 import { HandlerService } from './handler.service'
 import { ConfigService } from '@nestjs/config'
 import { BackendSDK } from '../sdk/backend-sdk'
+import {
+  InternalServerErrorException,
+  NotFoundException
+} from '@nestjs/common'
 import * as fs from 'fs'
 
 jest.mock('fs', () => ({
@@ -73,15 +77,17 @@ describe('HandlerService', () => {
   })
 
   describe('importHandler', () => {
-    it('should throw an exception if the handler file does not exist', async () => {
+    it('should throw a NotFoundException if the handler file does not exist', async () => {
       ;(fs.existsSync as jest.Mock).mockReturnValue(false)
 
       await expect(service.importHandler('handler')).rejects.toThrow(
-        'Handler not found'
+        NotFoundException
       )
     })
 
-    it('should throw an exception if the handler default export is not a function', async () => {
+    it('should throw an InternalServerErrorException if the handler default export is not a function', async () => {
+      ;(fs.existsSync as jest.Mock).mockReturnValue(true)
+
       jest.spyOn(service, 'dynamicImport').mockResolvedValue(
         Promise.resolve({
           default: 'not a function'
@@ -89,7 +95,19 @@ describe('HandlerService', () => {
       )
 
       await expect(service.importHandler('handler')).rejects.toThrow(
-        'Handler not found'
+        InternalServerErrorException
+      )
+    })
+
+    it('should throw an InternalServerErrorException if dynamic import fails', async () => {
+      ;(fs.existsSync as jest.Mock).mockReturnValue(true)
+
+      jest
+        .spyOn(service, 'dynamicImport')
+        .mockRejectedValue(new Error('Module not found'))
+
+      await expect(service.importHandler('handler')).rejects.toThrow(
+        InternalServerErrorException
       )
     })
 

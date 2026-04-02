@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common'
+import {
+  BadRequestException,
+  Injectable,
+  InternalServerErrorException,
+  Logger
+} from '@nestjs/common'
 import { kebabize } from '@repo/common'
 import { DEFAULT_IMAGE_SIZES, STORAGE_PATH } from '../../constants'
 
@@ -14,6 +19,7 @@ import { PutObjectCommand, S3Client } from '@aws-sdk/client-s3'
 
 @Injectable()
 export class StorageService {
+  private readonly logger = new Logger(StorageService.name)
   private isS3Enabled: boolean = false
   private s3Client: S3Client
   private s3Endpoint: string
@@ -85,10 +91,17 @@ export class StorageService {
           )
         )
       ) {
-        throw new Error('Invalid file path')
+        throw new BadRequestException('Invalid file path')
       }
 
-      fs.writeFileSync(publicFolderPath, file.buffer)
+      try {
+        fs.writeFileSync(publicFolderPath, file.buffer)
+      } catch (error) {
+        this.logger.error(
+          `Failed to write file to ${publicFolderPath}: ${error instanceof Error ? error.message : error}`
+        )
+        throw new InternalServerErrorException('Failed to store file')
+      }
       return Promise.resolve(this.prependStorageUrl(filePath))
     }
   }
@@ -118,9 +131,8 @@ export class StorageService {
       const imageExtension: string = path.extname(image.originalname)
 
       if (['.jpg', '.jpeg', '.png'].indexOf(imageExtension) === -1) {
-        throw new HttpException(
-          `Unsupported image format: ${imageExtension}`,
-          400
+        throw new BadRequestException(
+          `Unsupported image format: ${imageExtension}`
         )
       }
 
@@ -152,9 +164,16 @@ export class StorageService {
             )
           )
         ) {
-          throw new Error('Invalid image path')
+          throw new BadRequestException('Invalid image path')
         }
-        fs.writeFileSync(publicFolderPath, resizedImageBuffer)
+        try {
+          fs.writeFileSync(publicFolderPath, resizedImageBuffer)
+        } catch (error) {
+          this.logger.error(
+            `Failed to write image to ${publicFolderPath}: ${error instanceof Error ? error.message : error}`
+          )
+          throw new InternalServerErrorException('Failed to store image')
+        }
         imagePaths[sizeName] = this.prependStorageUrl(imagePath)
       }
     }

@@ -1,4 +1,9 @@
-import { HttpException, Injectable } from '@nestjs/common'
+import {
+  Injectable,
+  InternalServerErrorException,
+  Logger,
+  NotFoundException
+} from '@nestjs/common'
 import { Request, Response } from 'express'
 import path from 'path'
 import fs from 'fs'
@@ -7,6 +12,8 @@ import { BackendSDK } from '../sdk/backend-sdk'
 
 @Injectable()
 export class HandlerService {
+  private readonly logger = new Logger(HandlerService.name)
+
   constructor(
     private configService: ConfigService,
     private readonly sdk: BackendSDK
@@ -48,14 +55,22 @@ export class HandlerService {
     )
 
     if (!fs.existsSync(handlerPath)) {
-      throw new HttpException('Handler not found', 500)
+      throw new NotFoundException('Handler not found')
     }
 
     // Import the handler.
-    const module = await this.dynamicImport(handlerPath)
+    let module: any
+    try {
+      module = await this.dynamicImport(handlerPath)
+    } catch (error) {
+      this.logger.error(
+        `Failed to import handler at ${handlerPath}: ${error instanceof Error ? error.message : error}`
+      )
+      throw new InternalServerErrorException('Failed to import handler')
+    }
 
     if (typeof module.default !== 'function') {
-      throw new HttpException('Handler is invalid', 500)
+      throw new InternalServerErrorException('Handler is invalid')
     }
 
     return module.default

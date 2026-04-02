@@ -1,3 +1,4 @@
+import { InternalServerErrorException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { OpenApiSchemaService } from '../services/open-api-schema.service'
 import {
@@ -357,7 +358,7 @@ describe('OpenApiSchemaService', () => {
       expect(schemas.NestedEntity.properties.id).toBeUndefined()
     })
 
-    it('should throw an error if the TS type is not found', () => {
+    it('should throw an InternalServerErrorException if the TS type is not found', () => {
       const invalidEntityTsTypeInfos: EntityTsTypeInfo[] = [
         {
           name: 'InvalidEntity',
@@ -373,7 +374,7 @@ describe('OpenApiSchemaService', () => {
 
       expect(() => {
         service.generateEntitySchemas(invalidEntityTsTypeInfos)
-      }).toThrow()
+      }).toThrow(InternalServerErrorException)
     })
 
     it('should create DTO types', () => {
