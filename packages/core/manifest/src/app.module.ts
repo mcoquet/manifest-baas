@@ -32,7 +32,8 @@ import { MysqlConnectionOptions } from 'typeorm/driver/mysql/MysqlConnectionOpti
 import config from './config/config'
 import { validateEnvironment } from './config/env.validation'
 import { ThrottlerGuard, ThrottlerModule } from '@nestjs/throttler'
-import { APP_GUARD } from '@nestjs/core'
+import { APP_FILTER, APP_GUARD } from '@nestjs/core'
+import { CoreExceptionFilter } from './core-exception.filter'
 
 @Module({
   imports: [
@@ -123,6 +124,10 @@ import { APP_GUARD } from '@nestjs/core'
     EventModule
   ],
   providers: [
+    {
+      provide: APP_FILTER,
+      useClass: CoreExceptionFilter
+    },
     {
       provide: APP_GUARD,
       useClass: ThrottlerGuard

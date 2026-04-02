@@ -1,3 +1,7 @@
+import {
+  BadRequestException,
+  InternalServerErrorException
+} from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { DEFAULT_IMAGE_SIZES } from '../../constants'
 import { ImageSizesObject } from '../../../../types/src'
@@ -194,7 +198,7 @@ describe('StorageService', () => {
       expect(sharp.prototype.toBuffer).toHaveBeenCalledTimes(2)
     })
 
-    it('should fail if the image format is unsupported', async () => {
+    it('should fail with BadRequestException if the image format is unsupported', async () => {
       const unsupportedImage = {
         buffer: Buffer.from('unsupported-image'),
         originalname: 'test.txt'
@@ -208,7 +212,34 @@ describe('StorageService', () => {
 
       await expect(
         service.storeImage(entity, property, unsupportedImage, imageSizes)
-      ).rejects.toThrow('Unsupported image format: .txt')
+      ).rejects.toThrow(BadRequestException)
+    })
+
+    it('should throw InternalServerErrorException when file write fails', () => {
+      fs.writeFileSync = jest.fn().mockImplementation(() => {
+        throw new Error('EACCES: permission denied')
+      })
+
+      expect(() =>
+        service.store(entity, property, file)
+      ).toThrow(InternalServerErrorException)
+    })
+
+    it('should throw InternalServerErrorException when image write fails', async () => {
+      jest
+        .spyOn(sharp.prototype, 'resize')
+        .mockImplementation(() => sharp.prototype)
+      jest
+        .spyOn(sharp.prototype, 'toBuffer')
+        .mockImplementation(() => Promise.resolve(Buffer.from('')))
+
+      fs.writeFileSync = jest.fn().mockImplementation(() => {
+        throw new Error('EACCES: permission denied')
+      })
+
+      await expect(
+        service.storeImage(entity, property, image, DEFAULT_IMAGE_SIZES)
+      ).rejects.toThrow(InternalServerErrorException)
     })
   })
 })

@@ -9,7 +9,7 @@ import {
   RelationshipManifest
 } from '@repo/types'
 
-import { Injectable, Logger } from '@nestjs/common'
+import { Injectable, InternalServerErrorException, Logger } from '@nestjs/common'
 import { DataSource, EntityMetadata, QueryRunner, Repository } from 'typeorm'
 import { EntityService } from '../../entity/services/entity.service'
 
@@ -52,7 +52,7 @@ export class SeederService {
       const fakerModule = await import('@faker-js/faker')
       this.faker = fakerModule.faker
     } catch {
-      throw new Error(
+      throw new InternalServerErrorException(
         '@faker-js/faker is not installed. Install it with: npm install -D @faker-js/faker'
       )
     }

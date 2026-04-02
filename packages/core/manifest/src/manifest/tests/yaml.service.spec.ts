@@ -1,4 +1,4 @@
-import { Logger } from '@nestjs/common'
+import { InternalServerErrorException, Logger } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { YamlService } from '../services/yaml.service'
 import * as fs from 'fs'
@@ -58,21 +58,51 @@ describe('YamlService', () => {
       expect(remoteAppSchema).toEqual(dummyRemoteAppSchema)
     })
 
-    it('should throw an error if it cannot load the manifest file', async () => {
+    it('should throw an InternalServerErrorException if it cannot load the manifest file from URL', async () => {
       // Mock fetch error.
       ;(global.fetch as jest.Mock).mockImplementation(() =>
         Promise.reject('Error')
       )
 
-      expect(async () => {
-        await service.loadManifestFromUrl('wrong')
-      }).rejects.toThrow()
+      await expect(service.loadManifestFromUrl('wrong')).rejects.toThrow(
+        InternalServerErrorException
+      )
 
       // Reset
       ;(global.fetch as jest.Mock).mockImplementation(() =>
         Promise.resolve({
           text: () => Promise.resolve(JSON.stringify(dummyRemoteAppSchema))
         })
+      )
+    })
+
+    it('should throw an InternalServerErrorException if it cannot read the manifest file', async () => {
+      ;(fs.readFileSync as jest.Mock).mockImplementation(() => {
+        throw new Error('ENOENT: no such file or directory')
+      })
+
+      await expect(service.load('nonexistent/path')).rejects.toThrow(
+        InternalServerErrorException
+      )
+
+      // Reset
+      ;(fs.readFileSync as jest.Mock).mockImplementation(
+        jest.fn().mockReturnValue(JSON.stringify(dummyAppSchema))
+      )
+    })
+
+    it('should throw an InternalServerErrorException if YAML parsing fails', async () => {
+      ;(fs.readFileSync as jest.Mock).mockImplementation(
+        jest.fn().mockReturnValue('invalid: yaml: content: [')
+      )
+
+      await expect(service.load('mocked manifest path')).rejects.toThrow(
+        InternalServerErrorException
+      )
+
+      // Reset
+      ;(fs.readFileSync as jest.Mock).mockImplementation(
+        jest.fn().mockReturnValue(JSON.stringify(dummyAppSchema))
       )
     })
   })

@@ -1,4 +1,9 @@
-import { Inject, Injectable, forwardRef } from '@nestjs/common'
+import {
+  Inject,
+  Injectable,
+  InternalServerErrorException,
+  forwardRef
+} from '@nestjs/common'
 import { SchemaService } from './schema.service'
 import { YamlService } from './yaml.service'
 
@@ -41,7 +46,7 @@ export class ManifestService {
    **/
   getAppManifest(options?: { fullVersion?: boolean }): AppManifest {
     if (!this.appManifest) {
-      throw new Error('Manifest not loaded')
+      throw new InternalServerErrorException('Manifest not loaded')
     }
 
     if (!options?.fullVersion) {

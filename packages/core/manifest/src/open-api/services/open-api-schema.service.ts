@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common'
+import { Injectable, InternalServerErrorException } from '@nestjs/common'
 import { generalSchemas } from '../schemas/general-schemas'
 import {
   ReferenceObject,
@@ -105,7 +105,7 @@ export class OpenApiSchemaService {
     )
 
     if (Object.keys(schema).length === 0) {
-      throw new Error(
+      throw new InternalServerErrorException(
         `No schema found for property type: ${property.type} (${property.manifestPropType})`
       )
     }

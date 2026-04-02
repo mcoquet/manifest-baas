@@ -1,4 +1,5 @@
 import { ConfigService } from '@nestjs/config'
+import { InternalServerErrorException } from '@nestjs/common'
 import { Test, TestingModule } from '@nestjs/testing'
 import { AppManifest, PropType } from '@repo/types'
 import { ADMIN_ENTITY_MANIFEST } from '../../constants'
@@ -127,13 +128,13 @@ describe('ManifestService', () => {
       ).toHaveBeenCalled()
     })
 
-    it('should throw an error if the manifest is not loaded', () => {
+    it('should throw an InternalServerErrorException if the manifest is not loaded', () => {
       // Set private property.
       ;(service as any).appManifest = undefined
 
       expect(() => {
         service.getAppManifest()
-      }).toThrow()
+      }).toThrow(InternalServerErrorException)
     })
   })
 
